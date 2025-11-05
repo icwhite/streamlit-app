@@ -5,41 +5,41 @@ import json
 from datetime import datetime
 
 # --- CONFIG ---
-st.set_page_config(page_title="Chat with LLM", page_icon="💬", layout="centered")
+st.set_page_config(page_title="User Study", page_icon="💬", layout="centered")
 
-# Add CSS for larger text and scrollable survey containers
-st.markdown(
-    """
-    <style>
-    body, div, p, label, .stRadio, .stMarkdown {
-        font-size: 18px !important;
-        line-height: 1.6 !important;
-    }
-    .stTextInput > div > div > input, .stTextArea textarea {
-        font-size: 18px !important;
-    }
-    .stButton button {
-        font-size: 18px !important;
-        padding: 0.6em 1.2em;
-        border-radius: 10px;
-    }
-    /* Scrollable survey container */
-    .survey-box {
-        max-height: 550px;
-        overflow-y: auto;
-        padding: 1rem;
-        border: 2px solid #e0e0e0;
-        border-radius: 12px;
-        background-color: #fafafa;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+# --- CSS ---
+st.markdown("""
+<style>
+body, div, p, label, .stRadio, .stMarkdown {
+    font-size: 18px !important;
+    line-height: 1.6 !important;
+}
+.stTextInput > div > div > input, .stTextArea textarea {
+    font-size: 18px !important;
+}
+.stButton button {
+    font-size: 18px !important;
+    padding: 0.6em 1.2em;
+    border-radius: 10px;
+}
+.survey-box {
+    max-height: 550px;
+    overflow-y: auto;
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background-color: #fafafa;
+}
+.missing {
+    color: red;
+    font-weight: bold;
+}
+</style>
+""", unsafe_allow_html=True)
 
 GOOGLE_DOC_URL = "https://docs.google.com/document/d/your-doc-id/edit"
 
-# --- INITIALIZE STATE ---
+# --- STATE ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "show_survey" not in st.session_state:
@@ -48,18 +48,35 @@ if "show_prestudy" not in st.session_state:
     st.session_state.show_prestudy = True
 if "prestudy" not in st.session_state:
     st.session_state.prestudy = {}
+if "poststudy" not in st.session_state:
+    st.session_state.poststudy = {}
 
 # --- HEADER ---
-st.title("💬 LLM Chat Interface")
+st.title("💬 User Study")
 st.markdown(f"[📄 Open related Google Doc]({GOOGLE_DOC_URL})")
+
+st.markdown("---")
+st.markdown("### Instructions")
+st.markdown("""
+You will be writing an essay, and may use the LLM chat to assist you in the writing process. 
+Use no other LLM than the one provided in this interface (e.g. chatgpt.com) and you may take as much time as you need. 
+First you must answer some pre-study questions about your attitudes toward AI and writing, before you begin the essay. 
+You may not use other sources such as the internet to inform your essay. 
+""")
+# --- Likert scale options ---
 
 likert = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
 
-# --- PRE-STUDY SURVEY ---
+# --- Helper for completeness check ---
+def unanswered_fields(data_dict):
+    """Return a list of question keys with missing answers."""
+    return [k for k, v in data_dict.items() if (v is None or v == "" or (isinstance(v, list) and len(v) == 0))]
+
+
+# --- PRE-STUDY ---
 if st.session_state.show_prestudy:
     st.subheader("🧠 Pre-Study Questions")
-    st.markdown("Please answer the following before starting the chat.")
-
+    st.markdown("Please answer **all questions** before continuing.")
     with st.container():
         st.markdown('<div class="survey-box">', unsafe_allow_html=True)
 
@@ -142,12 +159,18 @@ if st.session_state.show_prestudy:
         st.markdown("</div>", unsafe_allow_html=True)
 
     if st.button("Start Chat"):
-        st.session_state.show_prestudy = False
-        st.rerun()
+        missing = unanswered_fields(st.session_state.prestudy)
+        if missing:
+            st.markdown('<p class="missing">⚠️ Please answer all questions before continuing.</p>', unsafe_allow_html=True)
+        else:
+            st.session_state.show_prestudy = False
+            st.rerun()
 
-# --- CHAT SECTION ---
+
+# --- CHAT ---
 elif not st.session_state.show_survey:
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    st.subheader("💬 Chat with the LLM")
 
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
@@ -155,10 +178,8 @@ elif not st.session_state.show_survey:
 
     if prompt := st.chat_input("Type your message here..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
-
         with st.chat_message("user"):
             st.markdown(prompt)
-
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 try:
@@ -172,7 +193,6 @@ elif not st.session_state.show_survey:
                     answer = response.choices[0].message.content
                 except Exception as e:
                     answer = f"⚠️ Error: {e}"
-
                 st.markdown(answer)
                 st.session_state.messages.append({"role": "assistant", "content": answer})
 
@@ -180,12 +200,13 @@ elif not st.session_state.show_survey:
         st.session_state.show_survey = True
         st.rerun()
 
-# --- POST-STUDY SURVEY ---
+
+# --- POST-STUDY ---
 if st.session_state.show_survey:
     st.subheader("📝 Post-Study Questions")
-
     st.markdown('<div class="survey-box">', unsafe_allow_html=True)
-    st.session_state["poststudy"] = {}
+
+    likert_post = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
 
     with st.expander("📊 LLM Involvement", expanded=True):
         st.session_state.poststudy["percent_llm_generated"] = st.radio(
@@ -209,38 +230,19 @@ if st.session_state.show_survey:
             "question_originality": "Using the LLM made me question what counts as original writing.",
             "would_disclose": "I would disclose AI assistance if submitting this essay academically.",
         }
-        for key, question in questions.items():
-            st.session_state.poststudy[key] = st.radio(question, likert, index=None)
+        for key, q in questions.items():
+            st.session_state.poststudy[key] = st.radio(q, likert_post, index=None)
 
     with st.expander("🪶 Reflections on Your Essay", expanded=False):
-        st.session_state.poststudy["satisfied_with_essay"] = st.radio(
-            "I was satisfied with the essay.", likert, index=None
-        )
-
+        st.session_state.poststudy["satisfied_with_essay"] = st.radio("I was satisfied with the essay.", likert_post, index=None)
         st.session_state.poststudy["creativity_level"] = st.radio(
             "How creative do you feel you were in writing the essay?",
-            [
-                "Very creative",
-                "Somewhat creative",
-                "Neither creative nor uncreative",
-                "Somewhat uncreative",
-                "Not at all creative",
-            ],
+            ["Very creative", "Somewhat creative", "Neither creative nor uncreative", "Somewhat uncreative", "Not at all creative"],
             index=None,
         )
-
-        st.session_state.poststudy["essay_in_my_voice"] = st.radio(
-            "I felt the essay was written in my voice.", likert, index=None
-        )
-
-        st.session_state.poststudy["difficult_to_organize"] = st.radio(
-            "I found it difficult to organize my thoughts while writing.", likert, index=None
-        )
-
-        st.session_state.poststudy["writing_struggle"] = st.radio(
-            "Writing this essay was a struggle for me.", likert, index=None
-        )
-
+        st.session_state.poststudy["essay_in_my_voice"] = st.radio("I felt the essay was written in my voice.", likert_post, index=None)
+        st.session_state.poststudy["difficult_to_organize"] = st.radio("I found it difficult to organize my thoughts while writing.", likert_post, index=None)
+        st.session_state.poststudy["writing_struggle"] = st.radio("Writing this essay was a struggle for me.", likert_post, index=None)
         st.session_state.poststudy["essay_experience"] = st.text_area(
             "Please describe your experience writing this essay.\n"
             "Comment on: How well does the essay reflect your own views and writing style? "
@@ -250,22 +252,26 @@ if st.session_state.show_survey:
     st.markdown("</div>", unsafe_allow_html=True)
 
     if st.button("Submit Feedback"):
-        st.success("✅ Thank you for completing the study!")
+        missing = unanswered_fields(st.session_state.poststudy)
+        if missing:
+            st.markdown('<p class="missing">⚠️ Please answer all questions before submitting.</p>', unsafe_allow_html=True)
+        else:
+            st.success("✅ Thank you for completing the study!")
+            os.makedirs("responses", exist_ok=True)
 
-        results = {
-            "timestamp": datetime.now().isoformat(),
-            "prestudy": st.session_state.prestudy,
-            "poststudy": st.session_state.poststudy,
-        }
+            results = {
+                "timestamp": datetime.now().isoformat(),
+                "prestudy": st.session_state.prestudy,
+                "conversation": st.session_state.messages,   # <-- ✅ SAVE CHAT HISTORY
+                "poststudy": st.session_state.poststudy,
+            }
 
-        os.makedirs("responses", exist_ok=True)
-        filename = f"responses/session_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-        with open(filename, "w") as f:
-            json.dump(results, f, indent=2)
+            with open(f"responses/session_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json", "w") as f:
+                json.dump(results, f, indent=2)
 
-        st.session_state.show_survey = False
-        st.session_state.show_prestudy = True
-        st.session_state.messages = []
-        st.session_state.prestudy = {}
-        st.session_state.poststudy = {}
-        st.experimental_rerun()
+            # Reset
+            st.session_state.show_survey = False
+            st.session_state.show_prestudy = True
+            st.session_state.messages = []
+            st.session_state.prestudy = {}
+            st.session_state.poststudy = {}
