@@ -1,6 +1,7 @@
 import streamlit as st
 from openai import OpenAI
 import json
+import os
 
 # --- CONFIG ---
 st.set_page_config(page_title="Chat with LLM", page_icon="💬", layout="centered")
@@ -19,9 +20,7 @@ st.title("💬 LLM Chat Interface")
 st.markdown(f"[📄 Open related Google Doc]({GOOGLE_DOC_URL})")
 
 # --- Chat client (using OpenAI SDK or mock for demo) --
-with open('secrets.json') as f: 
-    OPENAI_API_KEY = json.load(f)['OPENAI_API_KEY']
-client = OpenAI(api_key=OPENAI_API_KEY)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # --- Chat Display ---
 for msg in st.session_state.messages:
