@@ -101,20 +101,38 @@ if st.session_state.show_prestudy:
             "I do not believe using AI for writing is acceptable in academic contexts.", likert, index=None, horizontal=True
         )
 
-        st.session_state.prestudy["ai_use_case"] = st.radio(
-            "For essay writing, I think AI tools should be used:",
-            [
-                "Not at all",
-                "Check grammar, spelling, or clarity",
-                "Offer suggestions on how to improve my writing",
-                "Help brainstorm or outline ideas",
-                "Rewrite my essay from scratch",
-                "Write the entire essay",
-                "Other (please specify)",
-            ],
-            index=None,
-            horizontal=True,
-        )
+        st.write("For essay writing, I think AI tools should be used for:")
+
+            # Define options
+        ai_options = [
+            "Not at all",
+            "Check grammar, spelling, or clarity",
+            "Offer suggestions on how to improve my writing",
+            "Help brainstorm or outline ideas",
+            "Rewrite my essay from scratch",
+            "Write the entire essay",
+            "Other (please specify)",
+        ]
+
+        # Store selections in session state
+        if "ai_use_case" not in st.session_state:
+            st.session_state.ai_use_case = []
+
+        # Create checkboxes
+        selected_ai_use = []
+        for opt in ai_options:
+            checked = st.checkbox(opt, key=f"ai_use_{opt}")
+            if checked:
+                selected_ai_use.append(opt)
+
+        st.session_state.prestudy["ai_use_case"] = selected_ai_use
+
+        # Show "Other" text input if selected
+        if "Other (please specify)" in selected_ai_use:
+            st.session_state.prestudy["other_use_case"] = st.text_input("Please specify:")
+        else:
+            st.session_state.prestudy["other_use_case"] = ""
+
 
         if st.session_state.prestudy.get("ai_use_case") == "Other (please specify)":
             st.session_state.prestudy["other_use_case"] = st.text_input("Please specify:")
