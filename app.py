@@ -77,7 +77,17 @@ likert = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
 
 # --- Helper for completeness check ---
 def unanswered_fields(data_dict):
-    return [k for k, v in data_dict.items() if (v is None or v == "" or (isinstance(v, list) and len(v) == 0))]
+    missing = []
+    for k, v in data_dict.items():
+        # Skip the "other_use_case" field unless "Other" was actually selected
+        if k == "other_use_case":
+            ai_use_cases = data_dict.get("ai_use_case", [])
+            if "Other (please specify)" not in ai_use_cases:
+                continue  # don't count it as missing
+        if v is None or v == "" or (isinstance(v, list) and len(v) == 0):
+            missing.append(k)
+    return missing
+
 
 # --- PRE-STUDY ---
 if st.session_state.show_prestudy:
@@ -266,8 +276,7 @@ if st.session_state.show_survey:
     st.session_state.poststudy["creativity_level"] = st.radio(
         "How creative do you feel you were in writing the essay?",
         ["Very creative", "Somewhat creative", "Neither creative nor uncreative", "Somewhat uncreative", "Not at all creative"],
-        index=None,
-        horizontal=True,
+        index=None
     )
     st.session_state.poststudy["essay_in_my_voice"] = st.radio("I felt the essay was written in my voice.", likert_post, index=None, horizontal=True)
     st.session_state.poststudy["difficult_to_organize"] = st.radio("I found it difficult to organize my thoughts while writing.", likert_post, index=None, horizontal=True)
@@ -282,6 +291,7 @@ if st.session_state.show_survey:
 
     if st.button("Submit Feedback"):
         missing = unanswered_fields(st.session_state.poststudy)
+        print(missing)
         if missing:
             st.markdown('<p class="missing">⚠️ Please answer all questions before submitting.</p>', unsafe_allow_html=True)
         else:

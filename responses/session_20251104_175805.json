@@ -1,0 +1,50 @@
+{
+  "timestamp": "2025-11-04T17:58:05.451838",
+  "prestudy": {
+    "ai_improve_writing": "Strongly disagree",
+    "ai_understand_style": "Strongly disagree",
+    "ai_trust_accuracy": "Strongly disagree",
+    "ai_academic_acceptability": "Strongly disagree",
+    "ai_use_case": "Not at all",
+    "struggle_structure": "Neutral",
+    "confident_writer": "Strongly agree",
+    "writing_time": "Neutral",
+    "writing_enjoyable": "Strongly agree",
+    "llm_use_frequency": "Never",
+    "llm_use_purpose": [
+      "Work or productivity tasks"
+    ],
+    "llm_last_experience": "sfasdf"
+  },
+  "conversation": [
+    {
+      "role": "user",
+      "content": "hi"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! How can I assist you today?"
+    }
+  ],
+  "poststudy": {
+    "percent_llm_generated": "100%",
+    "idea_generation": "Strongly disagree",
+    "feedback_quality": "Strongly disagree",
+    "irrelevant_suggestions": "Strongly disagree",
+    "learned_about_writing": "Strongly disagree",
+    "lost_control": "Strongly disagree",
+    "too_much_initiative": "Strongly disagree",
+    "collaboration": "Strongly disagree",
+    "matched_assistance": "Strongly disagree",
+    "distrust_suggestions": "Neutral",
+    "would_not_use_again": "Neutral",
+    "question_originality": "Neutral",
+    "would_disclose": "Neutral",
+    "satisfied_with_essay": "Neutral",
+    "creativity_level": "Somewhat uncreative",
+    "essay_in_my_voice": "Neutral",
+    "difficult_to_organize": "Neutral",
+    "writing_struggle": "Neutral",
+    "essay_experience": "dfdfd"
+  }
+}

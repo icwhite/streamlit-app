@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-11-04T17:55:23.170938",
+  "prestudy": {
+    "ai_improve_writing": "Neutral",
+    "ai_understand_style": "Neutral",
+    "ai_trust_accuracy": "Neutral",
+    "ai_academic_acceptability": "Neutral",
+    "ai_use_case": "Rewrite my essay from scratch",
+    "struggle_structure": "Neutral",
+    "confident_writer": "Neutral",
+    "writing_time": "Neutral",
+    "writing_enjoyable": "Neutral",
+    "llm_use_frequency": "Monthly",
+    "llm_use_purpose": [
+      "Work or productivity tasks"
+    ],
+    "llm_last_experience": "asdfasdf"
+  },
+  "poststudy": {
+    "percent_llm_generated": "40%",
+    "idea_generation": "Strongly disagree",
+    "feedback_quality": "Strongly disagree",
+    "irrelevant_suggestions": "Strongly disagree",
+    "learned_about_writing": "Strongly disagree",
+    "lost_control": "Strongly disagree",
+    "too_much_initiative": "Strongly disagree",
+    "collaboration": "Strongly disagree",
+    "matched_assistance": "Strongly disagree",
+    "distrust_suggestions": "Strongly disagree",
+    "would_not_use_again": "Strongly disagree",
+    "question_originality": "Strongly disagree",
+    "would_disclose": "Strongly disagree",
+    "satisfied_with_essay": "Strongly disagree",
+    "creativity_level": "Very creative",
+    "essay_in_my_voice": "Strongly disagree",
+    "difficult_to_organize": "Strongly disagree",
+    "writing_struggle": "Strongly disagree",
+    "essay_experience": "asdfdf"
+  }
+}
