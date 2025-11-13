@@ -34,6 +34,14 @@ body, div, p, label, .stRadio, .stMarkdown {
     color: red;
     font-weight: bold;
 }
+/* --- Horizontal Likert fixes --- */
+.stRadio > div {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;  /* ✅ prevent wrapping to next line */
+    gap: 1.2rem !important;
+    justify-content: space-between !important; /* evenly spaced options */
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -63,15 +71,13 @@ Use no other LLM than the one provided in this interface (e.g. chatgpt.com) and 
 First you must answer some pre-study questions about your attitudes toward AI and writing, before you begin the essay. 
 You may not use other sources such as the internet to inform your essay. 
 """)
-# --- Likert scale options ---
 
+# --- Likert scale options ---
 likert = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
 
 # --- Helper for completeness check ---
 def unanswered_fields(data_dict):
-    """Return a list of question keys with missing answers."""
     return [k for k, v in data_dict.items() if (v is None or v == "" or (isinstance(v, list) and len(v) == 0))]
-
 
 # --- PRE-STUDY ---
 if st.session_state.show_prestudy:
@@ -80,81 +86,86 @@ if st.session_state.show_prestudy:
     with st.container():
         st.markdown('<div class="survey-box">', unsafe_allow_html=True)
 
-        with st.expander("💭 Attitudes toward AI and Writing", expanded=True):
-            st.session_state.prestudy["ai_improve_writing"] = st.radio(
-                "I believe AI tools can improve my writing quality.", likert, index=None
-            )
-            st.session_state.prestudy["ai_understand_style"] = st.radio(
-                "I do not expect AI systems to understand my writing style.", likert, index=None
-            )
-            st.session_state.prestudy["ai_trust_accuracy"] = st.radio(
-                "I trust AI systems to provide accurate information.", likert, index=None
-            )
-            st.session_state.prestudy["ai_academic_acceptability"] = st.radio(
-                "I do not believe using AI for writing is acceptable in academic contexts.", likert, index=None
-            )
+        # --- Section 1 ---
+        st.markdown("#### 💭 Attitudes toward AI and Writing")
+        st.session_state.prestudy["ai_improve_writing"] = st.radio(
+            "I believe AI tools can improve my writing quality.", likert, index=None, horizontal=True
+        )
+        st.session_state.prestudy["ai_understand_style"] = st.radio(
+            "I do not expect AI systems to understand my writing style.", likert, index=None, horizontal=True
+        )
+        st.session_state.prestudy["ai_trust_accuracy"] = st.radio(
+            "I trust AI systems to provide accurate information.", likert, index=None, horizontal=True
+        )
+        st.session_state.prestudy["ai_academic_acceptability"] = st.radio(
+            "I do not believe using AI for writing is acceptable in academic contexts.", likert, index=None, horizontal=True
+        )
 
-            st.session_state.prestudy["ai_use_case"] = st.radio(
-                "For essay writing, I think AI tools should be used:",
-                [
-                    "Not at all",
-                    "Check grammar, spelling, or clarity",
-                    "Offer suggestions on how to improve my writing",
-                    "Help brainstorm or outline ideas",
-                    "Rewrite my essay from scratch",
-                    "Write the entire essay",
-                    "Other (please specify)",
-                ],
-                index=None,
-            )
+        st.session_state.prestudy["ai_use_case"] = st.radio(
+            "For essay writing, I think AI tools should be used:",
+            [
+                "Not at all",
+                "Check grammar, spelling, or clarity",
+                "Offer suggestions on how to improve my writing",
+                "Help brainstorm or outline ideas",
+                "Rewrite my essay from scratch",
+                "Write the entire essay",
+                "Other (please specify)",
+            ],
+            index=None,
+            horizontal=True,
+        )
 
-            if st.session_state.prestudy.get("ai_use_case") == "Other (please specify)":
-                st.session_state.prestudy["other_use_case"] = st.text_input("Please specify:")
+        if st.session_state.prestudy.get("ai_use_case") == "Other (please specify)":
+            st.session_state.prestudy["other_use_case"] = st.text_input("Please specify:")
 
-        with st.expander("✍️ Writing Habits and Confidence", expanded=False):
-            st.session_state.prestudy["struggle_structure"] = st.radio(
-                "I often struggle with structuring my ideas clearly.", likert, index=None
-            )
-            st.session_state.prestudy["confident_writer"] = st.radio(
-                "I feel confident in my ability to write and edit essays on my own.", likert, index=None
-            )
-            st.session_state.prestudy["writing_time"] = st.radio(
-                "I find essay writing time-consuming.", likert, index=None
-            )
-            st.session_state.prestudy["writing_enjoyable"] = st.radio(
-                "I usually find essay writing enjoyable.", likert, index=None
-            )
+        # --- Section 2 ---
+        st.markdown("#### ✍️ Writing Habits and Confidence")
+        st.session_state.prestudy["struggle_structure"] = st.radio(
+            "I often struggle with structuring my ideas clearly.", likert, index=None, horizontal=True
+        )
+        st.session_state.prestudy["confident_writer"] = st.radio(
+            "I feel confident in my ability to write and edit essays on my own.", likert, index=None, horizontal=True
+        )
+        st.session_state.prestudy["writing_time"] = st.radio(
+            "I find essay writing time-consuming.", likert, index=None, horizontal=True
+        )
+        st.session_state.prestudy["writing_enjoyable"] = st.radio(
+            "I usually find essay writing enjoyable.", likert, index=None, horizontal=True
+        )
 
-        with st.expander("🤖 LLM Use", expanded=False):
-            st.session_state.prestudy["llm_use_frequency"] = st.radio(
-                "I use LLMs to help me write:",
-                ["Daily", "Weekly", "Monthly", "Checked it out a few times", "Never"],
-                index=None,
-            )
+        # --- Section 3 ---
+        st.markdown("#### 🤖 LLM Use")
+        st.session_state.prestudy["llm_use_frequency"] = st.radio(
+            "I use LLMs to help me write:",
+            ["Daily", "Weekly", "Monthly", "Checked it out a few times", "Never"],
+            index=None,
+            horizontal=True,
+        )
 
-            st.session_state.prestudy["llm_use_purpose"] = st.multiselect(
-                "What do you use LLMs for?",
-                [
-                    "I don’t use LLMs",
-                    "General conversation",
-                    "Search queries / seeking knowledge (e.g., health info)",
-                    "Learning or understanding new concepts",
-                    "Advice",
-                    "Writing or editing text (e.g., essays, emails, reports)",
-                    "Work or productivity tasks",
-                    "Other (please specify)",
-                ],
-                default=[],
-            )
+        st.session_state.prestudy["llm_use_purpose"] = st.multiselect(
+            "What do you use LLMs for?",
+            [
+                "I don’t use LLMs",
+                "General conversation",
+                "Search queries / seeking knowledge (e.g., health info)",
+                "Learning or understanding new concepts",
+                "Advice",
+                "Writing or editing text (e.g., essays, emails, reports)",
+                "Work or productivity tasks",
+                "Other (please specify)",
+            ],
+            default=[],
+        )
 
-            if "Other (please specify)" in st.session_state.prestudy["llm_use_purpose"]:
-                st.session_state.prestudy["llm_use_purpose_other"] = st.text_input("Please specify:")
+        if "Other (please specify)" in st.session_state.prestudy["llm_use_purpose"]:
+            st.session_state.prestudy["llm_use_purpose_other"] = st.text_input("Please specify:")
 
-            st.session_state.prestudy["llm_last_experience"] = st.text_area(
-                "Please describe the last time you used a large language model (LLM) such as ChatGPT, Claude, Gemini, or another AI assistant. "
-                "What did you use it for, and in what context (e.g., work, study, personal use)? "
-                "How helpful did you find the experience, and why?"
-            )
+        st.session_state.prestudy["llm_last_experience"] = st.text_area(
+            "Please describe the last time you used a large language model (LLM) such as ChatGPT, Claude, Gemini, or another AI assistant. "
+            "What did you use it for, and in what context (e.g., work, study, personal use)? "
+            "How helpful did you find the experience, and why?"
+        )
 
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -165,7 +176,6 @@ if st.session_state.show_prestudy:
         else:
             st.session_state.show_prestudy = False
             st.rerun()
-
 
 # --- CHAT ---
 elif not st.session_state.show_survey:
@@ -200,7 +210,6 @@ elif not st.session_state.show_survey:
         st.session_state.show_survey = True
         st.rerun()
 
-
 # --- POST-STUDY ---
 if st.session_state.show_survey:
     st.subheader("📝 Post-Study Questions")
@@ -208,46 +217,48 @@ if st.session_state.show_survey:
 
     likert_post = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
 
-    with st.expander("📊 LLM Involvement", expanded=True):
-        st.session_state.poststudy["percent_llm_generated"] = st.radio(
-            "What percentage of the document would you say was LLM-generated?",
-            ["0%", "20%", "40%", "60%", "80%", "100%"],
-            index=None,
-        )
+    st.markdown("#### 📊 LLM Involvement")
+    st.session_state.poststudy["percent_llm_generated"] = st.radio(
+        "What percentage of the document would you say was LLM-generated?",
+        ["0%", "20%", "40%", "60%", "80%", "100%"],
+        index=None,
+        horizontal=True,
+    )
 
-    with st.expander("💡 Reflections on LLM Use", expanded=False):
-        questions = {
-            "idea_generation": "The LLM helped me generate ideas more effectively.",
-            "feedback_quality": "The model’s feedback improved the quality of my essay.",
-            "irrelevant_suggestions": "The LLM’s suggestions were irrelevant to my goals.",
-            "learned_about_writing": "I learned something new about writing from using the LLM.",
-            "lost_control": "I felt I had less control of the essay writing process when working with the LLM.",
-            "too_much_initiative": "The model took too much initiative in generating content.",
-            "collaboration": "I felt that the LLM and I were collaborating as partners.",
-            "matched_assistance": "The model’s behavior matched my preferred level of assistance.",
-            "distrust_suggestions": "I did not trust the LLM’s writing suggestions.",
-            "would_not_use_again": "I would not use this LLM again for a similar writing task.",
-            "question_originality": "Using the LLM made me question what counts as original writing.",
-            "would_disclose": "I would disclose AI assistance if submitting this essay academically.",
-        }
-        for key, q in questions.items():
-            st.session_state.poststudy[key] = st.radio(q, likert_post, index=None)
+    st.markdown("#### 💡 Reflections on LLM Use")
+    questions = {
+        "idea_generation": "The LLM helped me generate ideas more effectively.",
+        "feedback_quality": "The model’s feedback improved the quality of my essay.",
+        "irrelevant_suggestions": "The LLM’s suggestions were irrelevant to my goals.",
+        "learned_about_writing": "I learned something new about writing from using the LLM.",
+        "lost_control": "I felt I had less control of the essay writing process when working with the LLM.",
+        "too_much_initiative": "The model took too much initiative in generating content.",
+        "collaboration": "I felt that the LLM and I were collaborating as partners.",
+        "matched_assistance": "The model’s behavior matched my preferred level of assistance.",
+        "distrust_suggestions": "I did not trust the LLM’s writing suggestions.",
+        "would_not_use_again": "I would not use this LLM again for a similar writing task.",
+        "question_originality": "Using the LLM made me question what counts as original writing.",
+        "would_disclose": "I would disclose AI assistance if submitting this essay academically.",
+    }
+    for key, q in questions.items():
+        st.session_state.poststudy[key] = st.radio(q, likert_post, index=None, horizontal=True)
 
-    with st.expander("🪶 Reflections on Your Essay", expanded=False):
-        st.session_state.poststudy["satisfied_with_essay"] = st.radio("I was satisfied with the essay.", likert_post, index=None)
-        st.session_state.poststudy["creativity_level"] = st.radio(
-            "How creative do you feel you were in writing the essay?",
-            ["Very creative", "Somewhat creative", "Neither creative nor uncreative", "Somewhat uncreative", "Not at all creative"],
-            index=None,
-        )
-        st.session_state.poststudy["essay_in_my_voice"] = st.radio("I felt the essay was written in my voice.", likert_post, index=None)
-        st.session_state.poststudy["difficult_to_organize"] = st.radio("I found it difficult to organize my thoughts while writing.", likert_post, index=None)
-        st.session_state.poststudy["writing_struggle"] = st.radio("Writing this essay was a struggle for me.", likert_post, index=None)
-        st.session_state.poststudy["essay_experience"] = st.text_area(
-            "Please describe your experience writing this essay.\n"
-            "Comment on: How well does the essay reflect your own views and writing style? "
-            "How much effort did you put into writing it? Did you learn anything during the process?"
-        )
+    st.markdown("#### 🪶 Reflections on Your Essay")
+    st.session_state.poststudy["satisfied_with_essay"] = st.radio("I was satisfied with the essay.", likert_post, index=None, horizontal=True)
+    st.session_state.poststudy["creativity_level"] = st.radio(
+        "How creative do you feel you were in writing the essay?",
+        ["Very creative", "Somewhat creative", "Neither creative nor uncreative", "Somewhat uncreative", "Not at all creative"],
+        index=None,
+        horizontal=True,
+    )
+    st.session_state.poststudy["essay_in_my_voice"] = st.radio("I felt the essay was written in my voice.", likert_post, index=None, horizontal=True)
+    st.session_state.poststudy["difficult_to_organize"] = st.radio("I found it difficult to organize my thoughts while writing.", likert_post, index=None, horizontal=True)
+    st.session_state.poststudy["writing_struggle"] = st.radio("Writing this essay was a struggle for me.", likert_post, index=None, horizontal=True)
+    st.session_state.poststudy["essay_experience"] = st.text_area(
+        "Please describe your experience writing this essay.\n"
+        "Comment on: How well does the essay reflect your own views and writing style? "
+        "How much effort did you put into writing it? Did you learn anything during the process?"
+    )
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -262,7 +273,7 @@ if st.session_state.show_survey:
             results = {
                 "timestamp": datetime.now().isoformat(),
                 "prestudy": st.session_state.prestudy,
-                "conversation": st.session_state.messages,   # <-- ✅ SAVE CHAT HISTORY
+                "conversation": st.session_state.messages,
                 "poststudy": st.session_state.poststudy,
             }
 
