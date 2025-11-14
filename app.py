@@ -3,6 +3,19 @@ from openai import OpenAI
 import os
 import json
 from datetime import datetime
+import firebase_admin
+from firebase_admin import credentials, firestore
+import streamlit as st
+
+# Initialize Firebase once
+if "firebase_initialized" not in st.session_state:
+    firebase_config = dict(st.secrets["FIREBASE"])
+    cred = credentials.Certificate(firebase_config)
+    firebase_admin.initialize_app(cred)
+    st.session_state.firebase_initialized = True
+
+db = firestore.client()
+
 
 # --- CONFIG ---
 st.set_page_config(page_title="User Study", page_icon="💬", layout="centered")
@@ -305,8 +318,14 @@ if st.session_state.show_survey:
                 "poststudy": st.session_state.poststudy,
             }
 
-            with open(f"responses/session_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json", "w") as f:
-                json.dump(results, f, indent=2)
+            session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            db.collection("user_study_responses").document(session_id).set({
+                "timestamp": datetime.now().isoformat(),
+                "prestudy": st.session_state.prestudy,
+                "conversation": st.session_state.messages,
+                "poststudy": st.session_state.poststudy,
+            })
 
             # Reset
             st.session_state.show_survey = False
