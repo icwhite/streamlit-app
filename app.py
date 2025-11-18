@@ -58,7 +58,7 @@ body, div, p, label, .stRadio, .stMarkdown {
 </style>
 """, unsafe_allow_html=True)
 
-GOOGLE_DOC_URL = "https://docs.google.com/document/d/your-doc-id/edit"
+GOOGLE_DOC_URL = os.environ.get("GOOGLE_DOC")
 
 # --- STATE ---
 if "messages" not in st.session_state:
@@ -80,7 +80,7 @@ st.markdown("---")
 st.markdown("### Instructions")
 st.markdown("""
 You will be writing an essay, and may use the LLM chat to assist you in the writing process. 
-Use no other LLM than the one provided in this interface (e.g. chatgpt.com) and you may take as much time as you need. 
+Use no other LLM than the one provided in this interface and you may take as much time as you need. 
 First you must answer some pre-study questions about your attitudes toward AI and writing, before you begin the essay. 
 You may not use other sources such as the internet to inform your essay. 
 """)
