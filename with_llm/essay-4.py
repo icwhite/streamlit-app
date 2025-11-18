@@ -321,6 +321,7 @@ if st.session_state.show_survey:
             session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
 
             db.collection("user_study_responses").document(session_id).set({
+                "google_doc": GOOGLE_DOC_URL,
                 "timestamp": datetime.now().isoformat(),
                 "prestudy": st.session_state.prestudy,
                 "conversation": st.session_state.messages,
