@@ -85,6 +85,7 @@ st.markdown("---")
 st.markdown("### Instructions")
 st.markdown("""
 Write your essay in the Google Doc provided below.  
+You are not allowed to use an LLM or AI assistant or the internet while writing this essay.
 Return here once the essay is complete to answer a few questions.
 """)
 
@@ -96,7 +97,6 @@ st.markdown(f"[📄 Open related Google Doc]({GOOGLE_DOC_URL})")
 # ---------------------------------------------------------
 if st.session_state.show_prestudy:
     st.subheader("🧠 Pre-Study Questions")
-    st.markdown('<div class="survey-box">', unsafe_allow_html=True)
 
     likert = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
 

@@ -107,7 +107,7 @@ if st.session_state.show_prestudy:
     st.subheader("🧠 Pre-Study Questions")
     st.markdown("Please answer **all questions** before continuing.")
     with st.container():
-        st.markdown('<div class="survey-box">', unsafe_allow_html=True)
+        # st.markdown('<div class="survey-box">', unsafe_allow_html=True)
 
         # --- Section 1 ---
         st.markdown("#### 💭 Attitudes toward AI and Writing")
