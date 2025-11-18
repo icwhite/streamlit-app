@@ -8,8 +8,8 @@ from firebase_admin import credentials, firestore
 import streamlit as st
 
 # Initialize Firebase once
-if "firebase_initialized" not in st.session_state:
-    firebase_config = dict(st.secrets["FIREBASE"])
+firebase_config = dict(st.secrets["FIREBASE"])
+if not firebase_admin._apps:
     cred = credentials.Certificate(firebase_config)
     firebase_admin.initialize_app(cred)
     st.session_state.firebase_initialized = True
