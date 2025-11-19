@@ -84,7 +84,8 @@ st.title("💬 User Study")
 st.markdown("---")
 st.markdown("### Instructions")
 st.markdown("""
-Write your essay in the Google Doc provided below.  
+First answer some pre-study questions about your writing habits and experiences.
+Then write your essay in the Google Doc provided.  
 You are not allowed to use an LLM or AI assistant or the internet while writing this essay.
 Return here once the essay is complete to answer a few questions.
 """)
