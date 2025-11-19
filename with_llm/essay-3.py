@@ -63,10 +63,12 @@ GOOGLE_DOC_URL = os.environ.get("GOOGLE_DOC")
 # --- STATE ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "show_consent" not in st.session_state:
+    st.session_state.show_consent = True
 if "show_survey" not in st.session_state:
     st.session_state.show_survey = False
 if "show_prestudy" not in st.session_state:
-    st.session_state.show_prestudy = True
+    st.session_state.show_prestudy = False
 if "prestudy" not in st.session_state:
     st.session_state.prestudy = {}
 if "poststudy" not in st.session_state:
@@ -100,6 +102,54 @@ def unanswered_fields(data_dict):
         if v is None or v == "" or (isinstance(v, list) and len(v) == 0):
             missing.append(k)
     return missing
+
+if st.session_state.show_consent:
+    st.title("📝 Consent Form")
+
+    st.markdown("""
+    Before participating in this study, please read the following consent information:
+
+    **Introduction**  
+    My name is Marwa Abdulhai. I am a PhD at the University of California, Berkeley, in the Electrical Engineering and Computer Science (EECS) Department. I am planning to conduct a research study, which I invite you to take part in.
+
+    **Purpose**  
+    The purpose of this study is to understand attitudes towards writing essays and analyze essay writing.
+    
+    **Procedures** 
+    You will be asked to answer some pre-study questions about your attitudes toward AI and writing, before you begin the essay. Then, you will write the essay. You may not use other sources such as the internet to inform your essay.
+    *Study time*: The estimated study completion time has been displayed to you in CloudResearch Connect interface (up to one hour).
+    *Study location*: You will participate online, from the comfort of your current location.
+    
+    **Benefits** 
+    There is no direct benefit to you (other than compensation) from participating in this study. We hope that the information gained from the study will help us better understand how people write essays.
+
+    **Risks/Discomforts**  
+    This study represents minimal risk to you. As with all research, there is the risk of an unintended breach of confidentiality. However, we are taking precautions to minimize this risk (see below).
+
+    **Confidentiality**
+    The data we collect will be stored on password-protected servers. Once the research is complete, we intend to scrub the data of all identifiable information. We will keep only the recorded survey responses, as well as a freshly generated identifier for each subject. The de-identified data will be retained indefinitely for possible use in future research done by ourselves or others. This cleaned dataset may be made public as part of the publishing process. No guarantees can be made regarding the interception of data sent via the Internet by any third parties.
+    
+    **Compensation**  
+    We compensate workers based on the estimated duration of completing the study. The study will be prorated to $10/hour for the anticipated duration of completing the study, which is posted for your job on the CloudResearch interface you used to view the job (duration includes reviewing instructions, completing the task, and filling an exit survey). The payment is arranged by CloudResearch via credit to subjects’ accounts.
+
+    **Rights**
+    Participation in research is completely voluntary. You have the right to decline to participate or to withdraw at any point in this study without penalty or loss of benefits to which you are otherwise entitled.
+    
+    **Questions**
+    If you have any questions or concerns about this study, or in case anything goes wrong with the online interface, you can contact Marwa Abdulhai at marwa_abdulhai@berkeley.edu. If you have any questions or concerns about your rights and treatment as a research subject, you may contact the office of UC Berkeley’s Committee for the Protection of Human Subjects, at 510-642-7461 or subjects@berkeley.edu.
+    
+    **IRB review**
+    This study was approved by an IRB review under the CPHS protocol ID number 2022-07-15514.
+    *You should save a copy of this consent form for your records*
+    By clicking **I Agree**, you consent to participate.
+    """)
+
+    if st.button("I Agree"):
+        st.session_state.show_consent = False
+        st.session_state.show_prestudy = True
+        st.rerun()
+
+    st.stop()
 
 
 # --- PRE-STUDY ---
@@ -254,7 +304,6 @@ elif not st.session_state.show_survey:
 # --- POST-STUDY ---
 if st.session_state.show_survey:
     st.subheader("📝 Post-Study Questions")
-    st.markdown('<div class="survey-box">', unsafe_allow_html=True)
 
     likert_post = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
 
