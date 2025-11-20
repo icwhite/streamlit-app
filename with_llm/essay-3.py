@@ -85,6 +85,10 @@ You will be writing an essay, and may use the LLM chat to assist you in the writ
 Use no other LLM than the one provided in this interface and you may take as much time as you need. 
 First you must answer some pre-study questions about your attitudes toward AI and writing, before you begin the essay. 
 You may not use other sources such as the internet to inform your essay. 
+You can use the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.
+            
+**Note**: The essay prompt can be found in the google and **in order to receive compensation your final response must be in the google doc** linked. 
+
 """)
 
 # --- Likert scale options ---
