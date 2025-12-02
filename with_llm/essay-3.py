@@ -18,7 +18,7 @@ db = firestore.client()
 
 
 # --- CONFIG ---
-st.set_page_config(page_title="User Study", page_icon="💬", layout="centered")
+st.set_page_config(page_title="User Study", page_icon="💬", layout="wide")
 
 # --- CSS ---
 st.markdown("""
@@ -73,10 +73,12 @@ if "prestudy" not in st.session_state:
     st.session_state.prestudy = {}
 if "poststudy" not in st.session_state:
     st.session_state.poststudy = {}
+if "essay_box" not in st.session_state:
+    st.session_state.essay_box = ""
 
 # --- HEADER ---
 st.title("💬 User Study")
-st.markdown(f"[📄 Open related Google Doc]({GOOGLE_DOC_URL})")
+# st.markdown(f"[📄 Open related Google Doc]({GOOGLE_DOC_URL})")
 
 st.markdown("---")
 st.markdown("### Instructions")
@@ -86,7 +88,8 @@ Use no other LLM than the one provided in this interface and you may take as muc
 First you must answer some pre-study questions about your attitudes toward AI and writing, before you begin the essay. 
 You may not use other sources such as the internet to inform your essay.
             
-*You can use the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.*
+The purpose of this study is to understand how people use LLMs for writing in their normal workflow. 
+If you don't usually use LLMs, think of like using the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.*
             
 **Note**: The essay prompt can be found in the google and **in order to receive compensation your final response must be in the google doc** linked. 
 
@@ -275,34 +278,58 @@ if st.session_state.show_prestudy:
 
 # --- CHAT ---
 elif not st.session_state.show_survey:
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    st.subheader("💬 Chat with the LLM")
+    
+    left_col, right_col = st.columns([1, 1])
+    with left_col:
+        st.subheader("✍️ Enter Your Writing Here")
+        essay_input = st.text_area(
+            "Enter your writing or text here:",
+            height=600,
+            key="essay_box",
+            placeholder="Paste or type your essay here..."
+        )
 
-    for msg in st.session_state.messages:
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+    # -----------------------------------------
+    # RIGHT COLUMN: CHAT INTERFACE
+    # -----------------------------------------
+    with right_col:
+        st.subheader("💬 Chat with the LLM")
 
-    if prompt := st.chat_input("Type your message here..."):
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
-        with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
-                try:
-                    response = client.chat.completions.create(
-                        model="gpt-4o-mini",
-                        messages=[
-                            {"role": "system", "content": "You are a friendly and helpful assistant."},
-                            *st.session_state.messages,
-                        ],
-                    )
-                    answer = response.choices[0].message.content
-                except Exception as e:
-                    answer = f"⚠️ Error: {e}"
-                st.markdown(answer)
-                st.session_state.messages.append({"role": "assistant", "content": answer})
+        # Show existing messages
+        for msg in st.session_state.messages:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+
+        # User prompt
+        if prompt := st.chat_input("Type your message here..."):
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            with st.chat_message("user"):
+                st.markdown(prompt)
+
+            with st.chat_message("assistant"):
+                with st.spinner("Thinking..."):
+                    try:
+                        response = client.chat.completions.create(
+                            model="gpt-4o-mini",
+                            messages=[
+                                {"role": "system", "content": "You are a friendly and helpful assistant."},
+                                *st.session_state.messages,
+                            ],
+                        )
+                        answer = response.choices[0].message.content
+                    except Exception as e:
+                        answer = f"⚠️ Error: {e}"
+
+                    st.markdown(answer)
+                    st.session_state.messages.append({"role": "assistant", "content": answer})
 
     if st.button("✅ Done"):
+        missing = st.session_state.essay_box == "" or len(st.session_state.essay_box.split()) < 300
+        if missing:
+            st.markdown('<p class="missing">⚠️ Please put the writing of 300 to 500 words in the text box</p>', unsafe_allow_html=True)
+        else:
+            st.success("✅ Thank you for completing the study!")
+            os.makedirs("responses", exist_ok=True)
         st.session_state.show_survey = True
         st.rerun()
 
@@ -370,6 +397,7 @@ if st.session_state.show_survey:
                 "prestudy": st.session_state.prestudy,
                 "conversation": st.session_state.messages,
                 "poststudy": st.session_state.poststudy,
+                "essay_text": st.session_state.essay_box
             }
 
             session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
