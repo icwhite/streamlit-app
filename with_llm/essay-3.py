@@ -6,6 +6,7 @@ from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials, firestore
 import streamlit as st
+from streamlit_js_eval import streamlit_js_eval
 
 # Initialize Firebase once
 firebase_config = dict(st.secrets["FIREBASE"])
@@ -75,6 +76,8 @@ if "poststudy" not in st.session_state:
     st.session_state.poststudy = {}
 if "essay_box" not in st.session_state:
     st.session_state.essay_box = ""
+if "do_scroll_top" not in st.session_state:
+    st.session_state.do_scroll_top = False
 
 # --- HEADER ---
 st.title("💬 User Study")
@@ -87,12 +90,10 @@ You will be writing an essay, and may use the LLM chat to assist you in the writ
 Use no other LLM than the one provided in this interface and you may take as much time as you need. 
 First you must answer some pre-study questions about your attitudes toward AI and writing, before you begin the essay. 
 You may not use other sources such as the internet to inform your essay.
+After the study you will be asked some post-study questions about your experience.
             
 The purpose of this study is to understand how people use LLMs for writing in their normal workflow. 
-If you don't usually use LLMs, think of like using the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.*
-            
-**Note**: The essay prompt can be found in the google and **in order to receive compensation your final response must be in the google doc** linked. 
-
+If you don't usually use LLMs, think of like using the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.
 """)
 
 # --- Likert scale options ---
@@ -110,6 +111,45 @@ def unanswered_fields(data_dict):
         if v is None or v == "" or (isinstance(v, list) and len(v) == 0):
             missing.append(k)
     return missing
+
+def scroll_to_top():
+    st.markdown(
+        """
+        <script>
+            window.parent.scrollTo({top: 0, behavior: 'smooth'});
+        </script>
+        """,
+        unsafe_allow_html=True,
+    )
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+def send_message():
+    user_text = st.session_state["chat_input"]
+    if not user_text.strip():
+        return
+
+    # Add user message
+    st.session_state.messages.append({"role": "user", "content": user_text})
+
+    # OpenAI call
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                *st.session_state.messages,
+            ],
+        )
+        assistant_reply = response.choices[0].message.content
+    except Exception as e:
+        assistant_reply = f"⚠️ API Error: {e}"
+
+    # Add assistant response
+    st.session_state.messages.append({"role": "assistant", "content": assistant_reply})
+
+    # Clear input field
+    st.session_state.chat_input = ""
 
 if st.session_state.show_consent:
     st.title("📝 Consent Form")
@@ -153,16 +193,22 @@ if st.session_state.show_consent:
     """)
 
     if st.button("I Agree"):
+        streamlit_js_eval(js_expressions="window.scrollTo(0, 0)")
         st.session_state.show_consent = False
         st.session_state.show_prestudy = True
+        st.session_state.do_scroll_top = True
         st.rerun()
 
     st.stop()
 
+if st.session_state.do_scroll_top:
+    streamlit_js_eval(js_expressions="window.scrollTo(0, 0)")
+    st.session_state.do_scroll_top = False   # reset the flag
+
 
 # --- PRE-STUDY ---
 if st.session_state.show_prestudy:
-    st.subheader("🧠 Pre-Study Questions")
+    st.subheader("🧠 Part I: Pre-Study Questions")
     st.markdown("Please answer **all questions** before continuing.")
     with st.container():
         # st.markdown('<div class="survey-box">', unsafe_allow_html=True)
@@ -273,13 +319,29 @@ if st.session_state.show_prestudy:
         if missing:
             st.markdown('<p class="missing">⚠️ Please answer all questions before continuing.</p>', unsafe_allow_html=True)
         else:
+            st.session_state.do_scroll_top = True
             st.session_state.show_prestudy = False
             st.rerun()
 
+
+
 # --- CHAT ---
 elif not st.session_state.show_survey:
+    st.subheader("💬 Part II: Essay Writing")
+    st.markdown("""
+    **Essay Prompt**: Is technology making our lives better or worse?
+        
+    Write your response to this essay which must be 300-500 words in the text box on the left while you chat with the LLM on the right.
+
+    The purpose of this study is to understand how people use LLMs for writing in their normal workflow. 
+    If you don't usually use LLMs, think of like using the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.
+    
+    **Note**: You must answer all questions and put an essay in the form to receive compensation for the study. If you use an LLM outside of this interface to complete the study we will be aware of it and will not compensate you.            
+    """)
     
     left_col, right_col = st.columns([1, 1])
+
+    # -------------------------- LEFT SIDE --------------------------
     with left_col:
         st.subheader("✍️ Enter Your Writing Here")
         essay_input = st.text_area(
@@ -289,42 +351,37 @@ elif not st.session_state.show_survey:
             placeholder="Paste or type your essay here..."
         )
 
+    # ----------------------- STATE SETUP ---------------------------
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
     # -----------------------------------------
     # RIGHT COLUMN: CHAT INTERFACE
     # -----------------------------------------
     with right_col:
-        st.subheader("💬 Chat with the LLM")
+        st.subheader("💬 Chat")
 
-        # Show existing messages
-        for msg in st.session_state.messages:
-            with st.chat_message(msg["role"]):
-                st.markdown(msg["content"])
+        # Chat history
+        chat_container = st.container()
+        with chat_container:
+            for msg in st.session_state.messages:
+                with st.chat_message(msg["role"]):
+                    st.markdown(msg["content"])
 
-        # User prompt
-        if prompt := st.chat_input("Type your message here..."):
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            with st.chat_message("user"):
-                st.markdown(prompt)
+        # INPUT + BUTTON, both inside the right column
+        st.text_input(
+            "Type your message:",
+            key="chat_input",
+            placeholder="Hi, how can I help you?",
+        )
 
-            with st.chat_message("assistant"):
-                with st.spinner("Thinking..."):
-                    try:
-                        response = client.chat.completions.create(
-                            model="gpt-4o-mini",
-                            messages=[
-                                {"role": "system", "content": "You are a friendly and helpful assistant."},
-                                *st.session_state.messages,
-                            ],
-                        )
-                        answer = response.choices[0].message.content
-                    except Exception as e:
-                        answer = f"⚠️ Error: {e}"
+        st.button("Send", on_click=send_message, use_container_width=True)
 
-                    st.markdown(answer)
-                    st.session_state.messages.append({"role": "assistant", "content": answer})
+
 
     if st.button("✅ Done"):
-        missing = st.session_state.essay_box == "" or len(st.session_state.essay_box.split()) < 300
+        st.session_state.do_scroll_top = True
+        missing = st.session_state.essay_box == ""
         if missing:
             st.markdown('<p class="missing">⚠️ Please put the writing of 300 to 500 words in the text box</p>', unsafe_allow_html=True)
         else:
@@ -335,7 +392,7 @@ elif not st.session_state.show_survey:
 
 # --- POST-STUDY ---
 if st.session_state.show_survey:
-    st.subheader("📝 Post-Study Questions")
+    st.subheader("📝 Part III: Post-Study Questions")
 
     likert_post = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
 
