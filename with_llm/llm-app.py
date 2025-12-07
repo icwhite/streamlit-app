@@ -17,6 +17,22 @@ if not firebase_admin._apps:
 
 db = firestore.client()
 
+query_params = st.query_params
+
+participant_id = query_params.get("participantId", None)
+assignment_id  = query_params.get("assignmentId", None)
+project_id     = query_params.get("projectId", None)
+
+# ---- 2. Store in session state (only once) ----
+if "participant_id" not in st.session_state and participant_id:
+    st.session_state.participant_id = participant_id
+
+if "assignment_id" not in st.session_state and assignment_id:
+    st.session_state.assignment_id = assignment_id
+
+if "project_id" not in st.session_state and project_id:
+    st.session_state.project_id = project_id
+
 
 # --- CONFIG ---
 st.set_page_config(page_title="User Study", page_icon="💬", layout="wide")
@@ -465,7 +481,10 @@ if st.session_state.show_survey:
                 "prestudy": st.session_state.prestudy,
                 "conversation": st.session_state.messages,
                 "poststudy": st.session_state.poststudy,
-                "essay_text": st.session_state.essay
+                "essay_text": st.session_state.essay, 
+                'participant_id': st.session_state.participant_id,
+                'assignment_id': st.session_state.assignment_id,
+                'project_id': st.session_state.project_id,
             })
 
             # Reset
