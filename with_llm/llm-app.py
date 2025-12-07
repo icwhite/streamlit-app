@@ -462,12 +462,6 @@ if st.session_state.show_survey:
         if missing:
             st.markdown('<p class="missing">⚠️ Please answer all questions before submitting.</p>', unsafe_allow_html=True)
         else:
-            st.markdown(
-                """
-                <meta http-equiv="refresh" content="0; URL='https://connect.cloudresearch.com/participant/project/497A4D2E07/complete" />
-                """,
-                unsafe_allow_html=True,
-            )
             st.success("✅ Thank you for completing the study!")
             os.makedirs("responses", exist_ok=True)
 
@@ -482,7 +476,6 @@ if st.session_state.show_survey:
             session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
 
             db.collection("user_study_responses").document(session_id).set({
-                "google_doc": GOOGLE_DOC_URL,
                 "timestamp": datetime.now().isoformat(),
                 "prestudy": st.session_state.prestudy,
                 "conversation": st.session_state.messages,
@@ -499,3 +492,10 @@ if st.session_state.show_survey:
             st.session_state.messages = []
             st.session_state.prestudy = {}
             st.session_state.poststudy = {}
+
+            st.markdown(
+                """
+                <meta http-equiv="refresh" content="0; URL='https://connect.cloudresearch.com/participant/project/497A4D2E07/complete" />
+                """,
+                unsafe_allow_html=True,
+            )
