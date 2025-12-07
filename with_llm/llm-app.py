@@ -493,9 +493,13 @@ if st.session_state.show_survey:
             st.session_state.prestudy = {}
             st.session_state.poststudy = {}
 
+            st.markdown("""
+            Go to the following link to complete your participation and receive compensation:
+            <a href="https://connect.cloudresearch.com/participant/project/497A4D2E07/complete" target="_blank">
+                        """)
             st.markdown(
                 """
-                <meta http-equiv="refresh" content="0; URL='https://connect.cloudresearch.com/participant/project/497A4D2E07/complete" />
+                <meta http-equiv="refresh" content="0; URL='https://connect.cloudresearch.com/participant/project/497A4D2E07/complete"/>
                 """,
                 unsafe_allow_html=True,
             )
