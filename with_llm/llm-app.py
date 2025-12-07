@@ -497,7 +497,6 @@ if st.session_state.show_survey:
             Go to the following link to complete your participation and receive compensation:
                         
             https://connect.cloudresearch.com/participant/project/497A4D2E07/complete
-            <a href="https://connect.cloudresearch.com/participant/project/497A4D2E07/complete" target="_blank">
                         """)
             # st.markdown(
             #     """
