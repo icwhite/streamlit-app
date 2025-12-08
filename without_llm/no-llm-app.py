@@ -20,6 +20,15 @@ participant_id = query_params.get("participantId", None)
 assignment_id  = query_params.get("assignmentId", None)
 project_id     = query_params.get("projectId", None)
 
+if "participant_id" not in st.session_state and participant_id:
+    st.session_state.participant_id = participant_id
+
+if "assignment_id" not in st.session_state and assignment_id:
+    st.session_state.assignment_id = assignment_id
+
+if "project_id" not in st.session_state and project_id:
+    st.session_state.project_id = project_id
+
 # --- CONFIG ---
 st.set_page_config(page_title="User Study", page_icon="💬", layout="centered")
 
