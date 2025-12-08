@@ -14,6 +14,11 @@ if not firebase_admin._apps:
 
 db = firestore.client()
 
+query_params = st.query_params
+
+participant_id = query_params.get("participantId", None)
+assignment_id  = query_params.get("assignmentId", None)
+project_id     = query_params.get("projectId", None)
 
 # --- CONFIG ---
 st.set_page_config(page_title="User Study", page_icon="💬", layout="centered")
@@ -292,9 +297,18 @@ if st.session_state.show_survey and not st.session_state.show_prestudy and not s
                 "prestudy": st.session_state.prestudy,
                 "poststudy": st.session_state.poststudy,
                 "essay_text": st.session_state.essay,
+                "participant_id": st.session_state.participant_id,
+                "assignment_id": st.session_state.assignment_id,
+                "project_id": st.session_state.project_id,
             })
 
             st.success("✅ Thank you for completing the study!")
+
+            st.markdown("""
+            Go to the following link to complete your participation and receive compensation:
+                        
+            https://connect.cloudresearch.com/participant/project/497A4D2E07/complete
+                        """)
 
             # Reset
             st.session_state.show_survey = False
