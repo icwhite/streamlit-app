@@ -473,9 +473,9 @@ if st.session_state.show_survey:
                 "essay_text": st.session_state.essay
             }
 
-            project_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+            db_name = "llm-assisted-" + datetime.now().strftime("%Y%m%d_%H%M%S")
 
-            db.collection("user_study_responses").document(project_id).set({
+            db.collection("user_study_responses").document(db_name).set({
                 "timestamp": datetime.now().isoformat(),
                 "prestudy": st.session_state.prestudy,
                 "conversation": st.session_state.messages,
