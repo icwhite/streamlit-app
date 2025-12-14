@@ -21,7 +21,7 @@ query_params = st.query_params
 
 prolific_pid = query_params.get("PROLIFIC_PID", None)
 study_id  = query_params.get("STUDY_ID", None)
-project_id     = query_params.get("project_id", None)
+session_id     = query_params.get("SESSION_ID", None)
 
 # ---- 2. Store in session state (only once) ----
 if "prolific_pid" not in st.session_state and prolific_pid:
@@ -30,8 +30,8 @@ if "prolific_pid" not in st.session_state and prolific_pid:
 if "study_id" not in st.session_state and study_id:
     st.session_state.study_id = study_id
 
-if "project_id" not in st.session_state and project_id:
-    st.session_state.project_id = project_id
+if "session_id" not in st.session_state and session_id:
+    st.session_state.session_id = session_id
 
 
 # --- CONFIG ---
@@ -483,7 +483,7 @@ if st.session_state.show_survey:
                 "essay_text": st.session_state.essay, 
                 'prolific_pid': st.session_state.prolific_pid,
                 'study_id': st.session_state.study_id,
-                'project_id': st.session_state.project_id,
+                'session_id': st.session_state.session_id,
             })
 
             # Reset
