@@ -19,16 +19,16 @@ db = firestore.client()
 
 query_params = st.query_params
 
-participant_id = query_params.get("participantId", None)
-assignment_id  = query_params.get("assignmentId", None)
-project_id     = query_params.get("projectId", None)
+prolific_pid = query_params.get("PROLIFIC_PID", None)
+study_id  = query_params.get("STUDY_ID", None)
+project_id     = query_params.get("project_id", None)
 
 # ---- 2. Store in session state (only once) ----
-if "participant_id" not in st.session_state and participant_id:
-    st.session_state.participant_id = participant_id
+if "prolific_pid" not in st.session_state and prolific_pid:
+    st.session_state.prolific_pid = prolific_pid
 
-if "assignment_id" not in st.session_state and assignment_id:
-    st.session_state.assignment_id = assignment_id
+if "study_id" not in st.session_state and study_id:
+    st.session_state.study_id = study_id
 
 if "project_id" not in st.session_state and project_id:
     st.session_state.project_id = project_id
@@ -473,16 +473,16 @@ if st.session_state.show_survey:
                 "essay_text": st.session_state.essay
             }
 
-            session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+            project_id = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-            db.collection("user_study_responses").document(session_id).set({
+            db.collection("user_study_responses").document(project_id).set({
                 "timestamp": datetime.now().isoformat(),
                 "prestudy": st.session_state.prestudy,
                 "conversation": st.session_state.messages,
                 "poststudy": st.session_state.poststudy,
                 "essay_text": st.session_state.essay, 
-                'participant_id': st.session_state.participant_id,
-                'assignment_id': st.session_state.assignment_id,
+                'prolific_pid': st.session_state.prolific_pid,
+                'study_id': st.session_state.study_id,
                 'project_id': st.session_state.project_id,
             })
 
