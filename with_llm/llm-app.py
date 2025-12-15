@@ -218,7 +218,15 @@ if st.session_state.show_consent:
     st.stop()
 
 if st.session_state.do_scroll_top:
-    streamlit_js_eval(js_expressions="window.scrollTo(0, 0)")
+    # streamlit_js_eval(js_expressions="window.scrollTo(0, 0)")
+    streamlit_js_eval(
+        js_expressions="""
+        const main = parent.document.querySelector('section.main');
+        if (main) {
+            main.scrollTo({ top: 0, behavior: 'instant' });
+        }
+        """
+    )
     st.session_state.do_scroll_top = False   # reset the flag
 
 
