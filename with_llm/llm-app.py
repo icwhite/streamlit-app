@@ -212,7 +212,7 @@ if st.session_state.show_consent:
         streamlit_js_eval(js_expressions="window.scrollTo(0, 0)")
         st.session_state.show_consent = False
         st.session_state.show_prestudy = True
-        st.session_state.do_scroll_top = True
+        # st.session_state.do_scroll_top = True
         st.rerun()
 
     st.stop()
@@ -345,13 +345,7 @@ if st.session_state.show_prestudy:
 elif not st.session_state.show_survey:
     st.subheader("💬 Part II: Essay Writing")
     
-    
-    left_col, right_col = st.columns([1, 1])
-
-    # -------------------------- LEFT SIDE --------------------------
-    with left_col:
-        st.subheader("✍️ Enter Your Writing Here")
-        st.markdown("""
+    st.markdown("""
         **Essay Prompt**: Is technology making our lives better or worse?
             
         Write your response to this essay which must be 300-500 words in the text box on the left while you chat with the LLM on the right.
@@ -361,6 +355,13 @@ elif not st.session_state.show_survey:
         
         **Note**: You must answer all questions and put an essay in the form to receive compensation for the study.
         """)
+    
+    left_col, right_col = st.columns([1, 1])
+
+    # -------------------------- LEFT SIDE --------------------------
+    with left_col:
+        st.subheader("✍️ Enter Your Writing Here")
+        
         st.session_state.essay = st.text_area(
             "Enter your writing or text here:",
             height=600,
