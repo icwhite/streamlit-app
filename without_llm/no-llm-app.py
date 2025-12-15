@@ -16,18 +16,19 @@ db = firestore.client()
 
 query_params = st.query_params
 
-participant_id = query_params.get("participantId", None)
-assignment_id  = query_params.get("assignmentId", None)
-project_id     = query_params.get("projectId", None)
+prolific_pid = query_params.get("PROLIFIC_PID", None)
+study_id  = query_params.get("STUDY_ID", None)
+session_id     = query_params.get("SESSION_ID", None)
 
-if "participant_id" not in st.session_state and participant_id:
-    st.session_state.participant_id = participant_id
+# ---- 2. Store in session state (only once) ----
+if "prolific_pid" not in st.session_state and prolific_pid:
+    st.session_state.prolific_pid = prolific_pid
 
-if "assignment_id" not in st.session_state and assignment_id:
-    st.session_state.assignment_id = assignment_id
+if "study_id" not in st.session_state and study_id:
+    st.session_state.study_id = study_id
 
-if "project_id" not in st.session_state and project_id:
-    st.session_state.project_id = project_id
+if "session_id" not in st.session_state and session_id:
+    st.session_state.session_id = session_id
 
 # --- CONFIG ---
 st.set_page_config(page_title="User Study", page_icon="💬", layout="centered")
@@ -306,9 +307,9 @@ if st.session_state.show_survey and not st.session_state.show_prestudy and not s
                 "prestudy": st.session_state.prestudy,
                 "poststudy": st.session_state.poststudy,
                 "essay_text": st.session_state.essay,
-                "participant_id": st.session_state.participant_id,
-                "assignment_id": st.session_state.assignment_id,
-                "project_id": st.session_state.project_id,
+                'prolific_pid': st.session_state.prolific_pid,
+                'study_id': st.session_state.study_id,
+                'session_id': st.session_state.session_id,
             })
 
             st.success("✅ Thank you for completing the study!")
@@ -316,7 +317,7 @@ if st.session_state.show_survey and not st.session_state.show_prestudy and not s
             st.markdown("""
             Go to the following link to complete your participation and receive compensation:
                         
-            https://connect.cloudresearch.com/participant/project/497A4D2E07/complete
+            https://app.prolific.com/submissions/complete?cc=CVE7FYWU
                         """)
 
             # Reset

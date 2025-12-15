@@ -344,22 +344,23 @@ if st.session_state.show_prestudy:
 # --- CHAT ---
 elif not st.session_state.show_survey:
     st.subheader("💬 Part II: Essay Writing")
-    st.markdown("""
-    **Essay Prompt**: Is technology making our lives better or worse?
-        
-    Write your response to this essay which must be 300-500 words in the text box on the left while you chat with the LLM on the right.
-
-    The purpose of this study is to understand how people use LLMs for writing in their normal workflow. 
-    If you don't usually use LLMs, think of like using the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.
     
-    **Note**: You must answer all questions and put an essay in the form to receive compensation for the study.
-    """)
     
     left_col, right_col = st.columns([1, 1])
 
     # -------------------------- LEFT SIDE --------------------------
     with left_col:
         st.subheader("✍️ Enter Your Writing Here")
+        st.markdown("""
+        **Essay Prompt**: Is technology making our lives better or worse?
+            
+        Write your response to this essay which must be 300-500 words in the text box on the left while you chat with the LLM on the right.
+
+        The purpose of this study is to understand how people use LLMs for writing in their normal workflow. 
+        If you don't usually use LLMs, think of like using the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.
+        
+        **Note**: You must answer all questions and put an essay in the form to receive compensation for the study.
+        """)
         st.session_state.essay = st.text_area(
             "Enter your writing or text here:",
             height=600,
@@ -496,7 +497,7 @@ if st.session_state.show_survey:
             st.markdown("""
             Go to the following link to complete your participation and receive compensation:
                         
-            https://connect.cloudresearch.com/participant/project/497A4D2E07/complete
+            https://app.prolific.com/submissions/complete?cc=CVE7FYWU
                         """)
             # st.markdown(
             #     """
