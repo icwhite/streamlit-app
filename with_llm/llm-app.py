@@ -356,7 +356,7 @@ elif not st.session_state.show_survey:
     st.subheader("💬 Part II: Essay Writing")
     
     st.markdown("""
-        **Essay Prompt**: Is technology making our lives better or worse?
+        **Essay Prompt**: Does money lead to happiness?
             
         Write your response to this essay which must be 300-500 words in the text box on the left while you chat with the LLM on the right.
 

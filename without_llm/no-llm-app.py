@@ -232,7 +232,7 @@ if st.session_state.waiting_for_done and not st.session_state.show_prestudy:
     st.subheader("✍️ Part II: Write Your Essay")
 
     st.markdown("""
-        **Essay Prompt**: Is technology making our lives better or worse?
+        **Essay Prompt**: Does money lead to happiness?
                 
         
         Please write a 300-500 word essay expressing your views on this topic. 
