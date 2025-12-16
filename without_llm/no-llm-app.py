@@ -117,7 +117,7 @@ if st.session_state.show_consent:
     Before participating in this study, please read the following consent information:
 
     **Introduction**  
-    My name is Marwa Abdulhai. I am a PhD at the University of California, Berkeley, in the Electrical Engineering and Computer Science (EECS) Department. I am planning to conduct a research study, which I invite you to take part in.
+    My name is Isadora White. I am a PhD Student at the University of California, San Diego, in the Computer Science and Engineering Department. I am planning to conduct a research study, which I invite you to take part in.
 
     **Purpose**  
     The purpose of this study is to understand attitudes towards writing essays and analyze essay writing.
@@ -137,18 +137,18 @@ if st.session_state.show_consent:
     The data we collect will be stored on password-protected servers. Once the research is complete, we intend to scrub the data of all identifiable information. We will keep only the recorded survey responses, as well as a freshly generated identifier for each subject. The de-identified data will be retained indefinitely for possible use in future research done by ourselves or others. This cleaned dataset may be made public as part of the publishing process. No guarantees can be made regarding the interception of data sent via the Internet by any third parties.
     
     **Compensation**  
-    We compensate workers based on the estimated duration of completing the study. The study will be prorated to $10/hour for the anticipated duration of completing the study, which is posted for your job on the CloudResearch interface you used to view the job (duration includes reviewing instructions, completing the task, and filling an exit survey). The payment is arranged by CloudResearch via credit to subjects’ accounts.
+    We compensate workers based on the estimated duration of completing the study. The study will be prorated to $12/hour for the anticipated duration of completing the study, which is posted for your job on the Prolific interface you used to view the job (duration includes reviewing instructions, completing the task, and filling an exit survey). The payment is arranged by Prolific via credit to subjects’ accounts.
 
     **Rights**
     Participation in research is completely voluntary. You have the right to decline to participate or to withdraw at any point in this study without penalty or loss of benefits to which you are otherwise entitled.
     
     **Questions**
-    If you have any questions or concerns about this study, or in case anything goes wrong with the online interface, you can contact Marwa Abdulhai at marwa_abdulhai@berkeley.edu. If you have any questions or concerns about your rights and treatment as a research subject, you may contact the office of UC Berkeley’s Committee for the Protection of Human Subjects, at 510-642-7461 or subjects@berkeley.edu.
+    If you have any questions or concerns about this study, or in case anything goes wrong with the online interface, you can contact Isadora White at i2white@ucsd.edu. 
     
     **IRB review**
-    This study was approved by an IRB review under the CPHS protocol ID number 2022-07-15514.
+    This study was approved by an IRB review under the University of California, San Diego’s Institutional Review Board (IRB). The IRB number is 813728.
     *You should save a copy of this consent form for your records*
-    By clicking **I Agree**, you consent to participate.
+    By continuing in this study and clicking the checkbox below you are indicating that you have read and understand the consent form and agree to participate in this study.
     """)
 
     if st.button("I Agree"):
