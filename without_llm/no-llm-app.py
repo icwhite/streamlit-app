@@ -107,7 +107,8 @@ You are not allowed to use an LLM or AI assistant or the internet while writing 
 Return here once the essay is complete to answer a few questions.
             
 Please be aware that we will review responses for indications of LLM or AI-generated content. Participants found to have used such tools will not receive compensation.
-            
+
+**You have a maximum of one hour** to complete the study.          
 """)
 
 if st.session_state.show_consent:

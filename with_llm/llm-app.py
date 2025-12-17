@@ -112,6 +112,8 @@ After the study you will be asked some post-study questions about your experienc
             
 The purpose of this study is to understand how people use LLMs for writing in their normal workflow. 
 If you don't usually use LLMs, think of like using the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.
+            
+**You have a maximum of one hour** to complete the study.
 """)
 
 # --- Likert scale options ---
@@ -364,6 +366,8 @@ elif not st.session_state.show_survey:
         If you don't usually use LLMs, think of like using the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.
         
         **Note**: You must answer all questions and put an essay in the form to receive compensation for the study.
+                
+        **Use no other AI than the one provided in this interface**.
         """)
     
     left_col, right_col = st.columns([1, 1])
