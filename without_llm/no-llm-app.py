@@ -318,7 +318,7 @@ if st.session_state.show_survey and not st.session_state.show_prestudy and not s
             st.markdown("""
             Go to the following link to complete your participation and receive compensation:
                         
-            https://app.prolific.com/submissions/complete?cc=CVE7FYWU
+            https://app.prolific.com/submissions/complete?cc=C12IBWL8
                         """)
 
             # Reset
