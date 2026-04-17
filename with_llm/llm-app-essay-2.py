@@ -143,7 +143,7 @@ def send_message():
     # OpenAI call
     try:
         response = client.chat.completions.create(
-            model="openai/gpt-4o-mini",
+            model="openai/gpt-5.2",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 *st.session_state.messages,
