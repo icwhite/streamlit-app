@@ -101,21 +101,6 @@ if "do_scroll_top" not in st.session_state:
 st.title("💬 User Study")
 # st.markdown(f"[📄 Open related Google Doc]({GOOGLE_DOC_URL})")
 
-st.markdown("---")
-st.markdown("### Instructions")
-st.markdown("""
-You will be writing an essay, and may use the LLM chat to assist you in the writing process. 
-Use no other LLM than the one provided in this interface and you may take as much time as you need. 
-First you must answer some pre-study questions about your attitudes toward AI and writing, before you begin the essay. 
-You may not use other sources such as the internet to inform your essay.
-After the study you will be asked some post-study questions about your experience.
-            
-The purpose of this study is to understand how people use LLMs for writing in their normal workflow. 
-If you don't usually use LLMs, think of like using the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.
-            
-**You have a maximum of one hour** to complete the study.
-""")
-
 # --- Likert scale options ---
 likert = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
 
@@ -142,7 +127,10 @@ def scroll_to_top():
         unsafe_allow_html=True,
     )
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+)
 
 def send_message():
     user_text = st.session_state["chat_input"]
@@ -155,7 +143,7 @@ def send_message():
     # OpenAI call
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="openai/gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 *st.session_state.messages,
@@ -195,7 +183,7 @@ if st.session_state.show_consent:
     This study represents minimal risk to you. As with all research, there is the risk of an unintended breach of confidentiality. However, we are taking precautions to minimize this risk (see below).
 
     **Confidentiality**
-    The data we collect will be stored on password-protected servers. Once the research is complete, we intend to scrub the data of all identifiable information. We will keep only the recorded survey responses, as well as a freshly generated identifier for each subject. The de-identified data will be retained indefinitely for possible use in future research done by ourselves or others. This cleaned dataset may be made public as part of the publishing process. No guarantees can be made regarding the interception of data sent via the Internet by any third parties.
+    The data we collect will be stored on password-protected servers. Once the research is complete, we intend to scrub the data of all identifiable information. We will keep only the recorded survey responses, as well as a freshly generated identifier for each subject. The de-identified data will be retained indefinitely for possible use for research purposes. 
     
     **Compensation**  
     We compensate workers based on the estimated duration of completing the study. The study will be prorated to $12/hour for the anticipated duration of completing the study, which is posted for your job on the Prolific interface you used to view the job (duration includes reviewing instructions, completing the task, and filling an exit survey). The payment is arranged by Prolific via credit to subjects’ accounts.
@@ -356,14 +344,25 @@ if st.session_state.show_prestudy:
 # --- CHAT ---
 elif not st.session_state.show_survey:
     st.subheader("💬 Part II: Essay Writing")
-    
+
+    st.markdown("---")
+    st.markdown("### Instructions")
+    st.markdown("""
+    You will be writing an essay, and may use the LLM chat to assist you in the writing process. 
+    Use no other LLM than the one provided in this interface and you may take as much time as you need. 
+    You may not use other sources such as the internet to inform your essay.
+    After the study you will be asked some post-study questions about your experience.
+                
+    The purpose of this study is to understand how people use LLMs for writing in their normal workflow. 
+    If you don't usually use LLMs, think of like using the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.
+                
+    **You have a maximum of one hour** to complete the study.
+    """)
+
     st.markdown("""
         **Essay Prompt**: Does money lead to happiness?
             
         Write your response to this essay which must be 300-500 words in the text box on the left while you chat with the LLM on the right.
-
-        The purpose of this study is to understand how people use LLMs for writing in their normal workflow. 
-        If you don't usually use LLMs, think of like using the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.
         
         **Note**: You must answer all questions and put an essay in the form to receive compensation for the study.
                 

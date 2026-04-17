@@ -17,9 +17,27 @@ if not firebase_admin._apps:
 
 db = firestore.client()
 
+query_params = st.query_params
+
+prolific_pid = query_params.get("PROLIFIC_PID", None)
+study_id  = query_params.get("STUDY_ID", None)
+session_id     = query_params.get("SESSION_ID", None)
+
+# ---- 2. Store in session state (only once) ----
+if "prolific_pid" not in st.session_state and prolific_pid:
+    st.session_state.prolific_pid = prolific_pid
+
+if "study_id" not in st.session_state and study_id:
+    st.session_state.study_id = study_id
+
+if "session_id" not in st.session_state and session_id:
+    st.session_state.session_id = session_id
+
 
 # --- CONFIG ---
 st.set_page_config(page_title="User Study", page_icon="💬", layout="wide")
+st.markdown('<div id="top"></div>', unsafe_allow_html=True)
+
 
 # --- CSS ---
 st.markdown("""
@@ -83,19 +101,6 @@ if "do_scroll_top" not in st.session_state:
 st.title("💬 User Study")
 # st.markdown(f"[📄 Open related Google Doc]({GOOGLE_DOC_URL})")
 
-st.markdown("---")
-st.markdown("### Instructions")
-st.markdown("""
-You will be writing an essay, and may use the LLM chat to assist you in the writing process. 
-Use no other LLM than the one provided in this interface and you may take as much time as you need. 
-First you must answer some pre-study questions about your attitudes toward AI and writing, before you begin the essay. 
-You may not use other sources such as the internet to inform your essay.
-After the study you will be asked some post-study questions about your experience.
-            
-The purpose of this study is to understand how people use LLMs for writing in their normal workflow. 
-If you don't usually use LLMs, think of like using the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.
-""")
-
 # --- Likert scale options ---
 likert = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
 
@@ -122,7 +127,10 @@ def scroll_to_top():
         unsafe_allow_html=True,
     )
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+)
 
 def send_message():
     user_text = st.session_state["chat_input"]
@@ -135,7 +143,7 @@ def send_message():
     # OpenAI call
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="openai/gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 *st.session_state.messages,
@@ -158,7 +166,7 @@ if st.session_state.show_consent:
     Before participating in this study, please read the following consent information:
 
     **Introduction**  
-    My name is Marwa Abdulhai. I am a PhD at the University of California, Berkeley, in the Electrical Engineering and Computer Science (EECS) Department. I am planning to conduct a research study, which I invite you to take part in.
+    My name is Isadora White. I am a PhD Student at the University of California, San Diego, in the Computer Science and Engineering Department. I am planning to conduct a research study, which I invite you to take part in.
 
     **Purpose**  
     The purpose of this study is to understand attitudes towards writing essays and analyze essay writing.
@@ -175,34 +183,38 @@ if st.session_state.show_consent:
     This study represents minimal risk to you. As with all research, there is the risk of an unintended breach of confidentiality. However, we are taking precautions to minimize this risk (see below).
 
     **Confidentiality**
-    The data we collect will be stored on password-protected servers. Once the research is complete, we intend to scrub the data of all identifiable information. We will keep only the recorded survey responses, as well as a freshly generated identifier for each subject. The de-identified data will be retained indefinitely for possible use in future research done by ourselves or others. This cleaned dataset may be made public as part of the publishing process. No guarantees can be made regarding the interception of data sent via the Internet by any third parties.
+    The data we collect will be stored on password-protected servers. Once the research is complete, we intend to scrub the data of all identifiable information. We will keep only the recorded survey responses, as well as a freshly generated identifier for each subject. The de-identified data will be retained indefinitely for possible use for research purposes. 
     
     **Compensation**  
-    We compensate workers based on the estimated duration of completing the study. The study will be prorated to $10/hour for the anticipated duration of completing the study, which is posted for your job on the CloudResearch interface you used to view the job (duration includes reviewing instructions, completing the task, and filling an exit survey). The payment is arranged by CloudResearch via credit to subjects’ accounts.
+    We compensate workers based on the estimated duration of completing the study. The study will be prorated to $12/hour for the anticipated duration of completing the study, which is posted for your job on the Prolific interface you used to view the job (duration includes reviewing instructions, completing the task, and filling an exit survey). The payment is arranged by Prolific via credit to subjects’ accounts.
 
     **Rights**
     Participation in research is completely voluntary. You have the right to decline to participate or to withdraw at any point in this study without penalty or loss of benefits to which you are otherwise entitled.
     
     **Questions**
-    If you have any questions or concerns about this study, or in case anything goes wrong with the online interface, you can contact Marwa Abdulhai at marwa_abdulhai@berkeley.edu. If you have any questions or concerns about your rights and treatment as a research subject, you may contact the office of UC Berkeley’s Committee for the Protection of Human Subjects, at 510-642-7461 or subjects@berkeley.edu.
+    If you have any questions or concerns about this study, or in case anything goes wrong with the online interface, you can contact Isadora White at i2white@ucsd.edu. 
     
     **IRB review**
-    This study was approved by an IRB review under the CPHS protocol ID number 2022-07-15514.
+    This study was approved by an IRB review under the University of California, San Diego’s Institutional Review Board (IRB). The IRB number is 813728.
     *You should save a copy of this consent form for your records*
-    By clicking **I Agree**, you consent to participate.
+    By continuing in this study and clicking the checkbox below you are indicating that you have read and understand the consent form and agree to participate in this study.
     """)
 
     if st.button("I Agree"):
         streamlit_js_eval(js_expressions="window.scrollTo(0, 0)")
         st.session_state.show_consent = False
         st.session_state.show_prestudy = True
-        st.session_state.do_scroll_top = True
+        # st.session_state.do_scroll_top = True
         st.rerun()
 
     st.stop()
 
 if st.session_state.do_scroll_top:
-    streamlit_js_eval(js_expressions="window.scrollTo(0, 0)")
+    # streamlit_js_eval(js_expressions="window.scrollTo(0, 0)")
+    st.markdown(
+        '<script>document.getElementById("top").scrollIntoView();</script>',
+        unsafe_allow_html=True
+    )
     st.session_state.do_scroll_top = False   # reset the flag
 
 
@@ -316,10 +328,14 @@ if st.session_state.show_prestudy:
 
     if st.button("Start Chat"):
         missing = unanswered_fields(st.session_state.prestudy)
+        st.session_state.do_scroll_top = True
         if missing:
             st.markdown('<p class="missing">⚠️ Please answer all questions before continuing.</p>', unsafe_allow_html=True)
         else:
-            st.session_state.do_scroll_top = True
+            st.markdown(
+                '<script>document.getElementById("top").scrollIntoView();</script>',
+                unsafe_allow_html=True
+            )
             st.session_state.show_prestudy = False
             st.rerun()
 
@@ -328,24 +344,39 @@ if st.session_state.show_prestudy:
 # --- CHAT ---
 elif not st.session_state.show_survey:
     st.subheader("💬 Part II: Essay Writing")
-    st.markdown("""
-    **Essay Prompt**: Is technology making our lives better or worse?
-        
-    Write your response to this essay which must be 300-500 words in the text box on the left while you chat with the LLM on the right.
 
+    st.markdown("---")
+    st.markdown("### Instructions")
+    st.markdown("""
+    You will be writing an essay, and may use the LLM chat to assist you in the writing process. 
+    Use no other LLM than the one provided in this interface and you may take as much time as you need. 
+    You may not use other sources such as the internet to inform your essay.
+    After the study you will be asked some post-study questions about your experience.
+                
     The purpose of this study is to understand how people use LLMs for writing in their normal workflow. 
     If you don't usually use LLMs, think of like using the AI tool as a partner while you work on this essay. Think of it like having someone to bounce ideas off, ask questions, and get feedback from as you go.
-    
-    **Note**: You must answer all questions and put an essay in the form to receive compensation for the study. If you use an LLM outside of this interface to complete the study we will be aware of it and will not compensate you.            
+                
+    **You have a maximum of one hour** to complete the study.
     """)
+
+    st.markdown("""
+        **Essay Prompt**: Is it ever justified to break the law?
+            
+        Write your response to this essay which must be 300-500 words in the text box on the left while you chat with the LLM on the right.
+        
+        **Note**: You must answer all questions and put an essay in the form to receive compensation for the study.
+                
+        **Use no other AI than the one provided in this interface**.
+        """)
     
     left_col, right_col = st.columns([1, 1])
 
     # -------------------------- LEFT SIDE --------------------------
     with left_col:
         st.subheader("✍️ Enter Your Writing Here")
-        essay_input = st.text_area(
-            "Enter your writing or text here:",
+        
+        st.session_state.essay = st.text_area(
+            "Scroll up to see the instructions and essay prompt. Enter your writing or text here:",
             height=600,
             key="essay_box",
             placeholder="Paste or type your essay here..."
@@ -454,17 +485,20 @@ if st.session_state.show_survey:
                 "prestudy": st.session_state.prestudy,
                 "conversation": st.session_state.messages,
                 "poststudy": st.session_state.poststudy,
-                "essay_text": st.session_state.essay_box
+                "essay_text": st.session_state.essay
             }
 
-            session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+            db_name = "llm-assisted-" + datetime.now().strftime("%Y%m%d_%H%M%S")
 
-            db.collection("user_study_responses").document(session_id).set({
-                "google_doc": GOOGLE_DOC_URL,
+            db.collection("user_study_responses").document(db_name).set({
                 "timestamp": datetime.now().isoformat(),
                 "prestudy": st.session_state.prestudy,
                 "conversation": st.session_state.messages,
                 "poststudy": st.session_state.poststudy,
+                "essay_text": st.session_state.essay, 
+                'prolific_pid': st.session_state.prolific_pid,
+                'study_id': st.session_state.study_id,
+                'session_id': st.session_state.session_id,
             })
 
             # Reset
@@ -473,3 +507,15 @@ if st.session_state.show_survey:
             st.session_state.messages = []
             st.session_state.prestudy = {}
             st.session_state.poststudy = {}
+
+            st.markdown("""
+            Go to the following link to complete your participation and receive compensation:
+                        
+            https://app.prolific.com/submissions/complete?cc=C12IBWL8
+                        """)
+            # st.markdown(
+            #     """
+            #     <meta http-equiv="refresh" content="0; URL='https://connect.cloudresearch.com/participant/project/497A4D2E07/complete"/>
+            #     """,
+            #     unsafe_allow_html=True,
+            # )

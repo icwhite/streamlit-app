@@ -99,17 +99,6 @@ def unanswered_fields(data_dict):
 # --- HEADER ---
 st.title("💬 User Study")
 st.markdown("---")
-st.markdown("### Instructions")
-st.markdown("""
-First answer some pre-study questions about your writing habits and experiences.
-Then write your essay in the text box provided.  
-You are not allowed to use an LLM or AI assistant or the internet while writing this essay.
-Return here once the essay is complete to answer a few questions.
-            
-Please be aware that we will review responses for indications of LLM or AI-generated content. Participants found to have used such tools will not receive compensation.
-
-**You have a maximum of one hour** to complete the study.          
-""")
 
 if st.session_state.show_consent:
     st.title("📝 Consent Form")
@@ -232,8 +221,19 @@ if st.session_state.show_prestudy:
 if st.session_state.waiting_for_done and not st.session_state.show_prestudy:
     st.subheader("✍️ Part II: Write Your Essay")
 
+    st.markdown("### Instructions")
     st.markdown("""
-        **Essay Prompt**: Does money lead to happiness?
+You will be writing an essay.
+You are not allowed to use an LLM or AI assistant or the internet while writing this essay.
+Return here once the essay is complete to answer a few questions.
+            
+Please be aware that we will review responses for indications of LLM or AI-generated content. Participants found to have used such tools will not receive compensation.
+
+**You have a maximum of one hour** to complete the study.          
+""")
+
+    st.markdown("""
+        **Essay Prompt**: Is it better to work on a team or alone?
                 
         
         Please write a 300-500 word essay expressing your views on this topic. 

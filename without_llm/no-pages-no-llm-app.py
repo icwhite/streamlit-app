@@ -133,7 +133,7 @@ There is no direct benefit to you (other than compensation) from participating i
 This study represents minimal risk to you. As with all research, there is the risk of an unintended breach of confidentiality. However, we are taking precautions to minimize this risk (see below).
 
 **Confidentiality**
-The data we collect will be stored on password-protected servers. Once the research is complete, we intend to scrub the data of all identifiable information. We will keep only the recorded survey responses, as well as a freshly generated identifier for each subject. The de-identified data will be retained indefinitely for possible use in future research done by ourselves or others. This cleaned dataset may be made public as part of the publishing process. No guarantees can be made regarding the interception of data sent via the Internet by any third parties.
+The data we collect will be stored on password-protected servers. Once the research is complete, we intend to scrub the data of all identifiable information. We will keep only the recorded survey responses, as well as a freshly generated identifier for each subject. The de-identified data will be retained indefinitely for possible use for research purposes. 
 
 **Compensation**  
 We compensate workers based on the estimated duration of completing the study. The study will be prorated to $12/hour for the anticipated duration of completing the study, which is posted for your job on the Prolific interface you used to view the job (duration includes reviewing instructions, completing the task, and filling an exit survey). The payment is arranged by Prolific via credit to subjects’ accounts.
