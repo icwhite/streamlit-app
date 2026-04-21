@@ -301,7 +301,7 @@ if st.session_state.show_survey and not st.session_state.show_prestudy and not s
                         unsafe_allow_html=True)
         else:
             # Save to Firestore
-            session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+            session_id = "essay-three-no-llm-" + datetime.now().strftime("%Y%m%d_%H%M%S")
             db.collection("user_study_responses").document(session_id).set({
                 "google_doc": GOOGLE_DOC_URL,
                 "timestamp": datetime.now().isoformat(),
@@ -318,7 +318,7 @@ if st.session_state.show_survey and not st.session_state.show_prestudy and not s
             st.markdown("""
             Go to the following link to complete your participation and receive compensation:
                         
-            https://app.prolific.com/submissions/complete?cc=C12IBWL8
+            https://app.prolific.com/submissions/complete?cc=CXR621YU
                         """)
 
             # Reset

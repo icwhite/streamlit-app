@@ -488,7 +488,7 @@ if st.session_state.show_survey:
                 "essay_text": st.session_state.essay
             }
 
-            db_name = "llm-assisted-" + datetime.now().strftime("%Y%m%d_%H%M%S")
+            db_name = "essay-three-with-llm-" + datetime.now().strftime("%Y%m%d_%H%M%S")
 
             db.collection("user_study_responses").document(db_name).set({
                 "timestamp": datetime.now().isoformat(),
@@ -511,7 +511,7 @@ if st.session_state.show_survey:
             st.markdown("""
             Go to the following link to complete your participation and receive compensation:
                         
-            https://app.prolific.com/submissions/complete?cc=C12IBWL8
+            https://app.prolific.com/submissions/complete?cc=CXR621YU
                         """)
             # st.markdown(
             #     """
