@@ -3,185 +3,405 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Music Rating Study</title>
+  <title>Music Study</title>
 
-  <!-- jsPsych 7 core -->
-  <script src="https://unpkg.com/jspsych@7.3.4"></script>
-  <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet">
-
-  <!-- jsPsych plugins -->
-  <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.3"></script>
-  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1.1.3"></script>
-  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-select@1.1.3"></script>
-  <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.3"></script>
-  <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.3"></script>
-  <script src="https://unpkg.com/@jspsych/plugin-audio-button-response@1.1.3"></script>
-  <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
-  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
-
-  <!-- Firebase SDK (modular v9 compat) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       background-color: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
     }
 
-    .jspsych-content {
-      max-width: 800px;
-      font-size: 18px;
-      line-height: 1.6;
-    }
-
-    .jspsych-btn {
-      font-size: 18px !important;
-      padding: 12px 28px !important;
-      border-radius: 10px !important;
-      background-color: #4a90d9;
-      color: white;
-      border: none;
-      cursor: pointer;
-      margin: 8px;
-    }
-
-    .jspsych-btn:hover {
-      background-color: #357abd;
-    }
-
-    .study-header {
+    .container {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 16px;
+      padding: 3rem;
+      max-width: 560px;
+      width: 100%;
       text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 1rem;
       margin-bottom: 2rem;
     }
 
-    .study-header h1 {
-      font-size: 2rem;
-      color: #333;
-    }
-
-    .instructions-box {
-      background: white;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 2rem;
-      margin: 1rem 0;
+    .form-group {
+      margin-bottom: 1.5rem;
       text-align: left;
     }
 
-    .sample-card {
-      background: white;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 2rem;
-      margin: 1rem auto;
-      max-width: 600px;
-    }
-
-    .sample-title {
-      font-size: 1.3rem;
-      font-weight: bold;
-      margin-bottom: 1rem;
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
       color: #333;
     }
 
-    .progress-bar {
+    input[type="text"] {
       width: 100%;
-      height: 8px;
-      background-color: #e0e0e0;
-      border-radius: 4px;
-      margin: 1rem 0;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background-color: #4a90d9;
-      border-radius: 4px;
-      transition: width 0.3s ease;
-    }
-
-    .rating-label {
+      padding: 12px 16px;
       font-size: 16px;
-      color: #666;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #4a90d9;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 36px;
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+      background-color: #4a90d9;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s;
       margin-top: 0.5rem;
     }
 
-    .likert-scale-container {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin: 1.5rem 0;
-      flex-wrap: wrap;
+    .btn:hover {
+      background-color: #357abd;
     }
 
-    .likert-btn {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 2px solid #4a90d9;
-      background: white;
-      font-size: 20px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s;
-      color: #4a90d9;
+    .btn:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
     }
 
-    .likert-btn:hover {
-      background-color: #4a90d9;
-      color: white;
-      transform: scale(1.1);
+    .status-msg {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 10px;
+      font-size: 15px;
+      line-height: 1.5;
     }
 
-    .likert-btn.selected {
-      background-color: #4a90d9;
-      color: white;
-      transform: scale(1.15);
-      box-shadow: 0 2px 8px rgba(74, 144, 217, 0.4);
+    .status-msg.info {
+      background: #e8f4fd;
+      color: #1a73e8;
     }
 
-    .scale-labels {
-      display: flex;
-      justify-content: space-between;
-      max-width: 400px;
-      margin: 0 auto;
+    .status-msg.success {
+      background: #eafaf1;
+      color: #27ae60;
+    }
+
+    .status-msg.error {
+      background: #fdf0ed;
+      color: #c0392b;
+    }
+
+    .status-msg.completed {
+      background: #f0f0f0;
+      color: #555;
+    }
+
+    .day-indicator {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-weight: 700;
       font-size: 14px;
-      color: #888;
+      margin-top: 0.5rem;
     }
 
-    .jspsych-survey-multi-choice-question {
-      margin-bottom: 1.5rem !important;
-      text-align: left !important;
+    .day-indicator.pretest { background: #e8f4fd; color: #1a73e8; }
+    .day-indicator.listening { background: #fef9e7; color: #f39c12; }
+    .day-indicator.posttest { background: #fdf0ed; color: #e74c3c; }
+
+    .hidden { display: none; }
+
+    .study-overview {
+      text-align: left;
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      background: #fafafa;
+      border-radius: 10px;
+      border: 1px solid #eee;
     }
 
-    .jspsych-survey-multi-choice-text {
-      font-size: 16px !important;
-      font-weight: 600 !important;
+    .study-overview h3 {
+      margin-bottom: 0.5rem;
+      font-size: 15px;
+      color: #555;
     }
 
-    .jspsych-survey-likert-statement {
-      font-size: 16px !important;
+    .study-overview ul {
+      list-style: none;
+      padding: 0;
     }
 
-    .completion-screen {
-      text-align: center;
-      padding: 2rem;
+    .study-overview li {
+      padding: 4px 0;
+      font-size: 14px;
+      color: #666;
     }
 
-    .completion-screen h2 {
-      color: #28a745;
-      font-size: 2rem;
-    }
-
-    audio {
-      width: 100%;
-      margin: 1rem 0;
+    .study-overview li strong {
+      color: #333;
     }
   </style>
 </head>
 <body>
-  <div id="jspsych-target"></div>
-  <script src="experiment.js"></script>
+  <div class="container">
+    <h1>🎵 Music Study</h1>
+    <p class="subtitle">7-Day Longitudinal Listening Study</p>
+
+    <div class="study-overview">
+      <h3>Study Schedule</h3>
+      <ul>
+        <li><strong>Day 1:</strong> Background survey + music comparison</li>
+        <li><strong>Days 2–6:</strong> Daily music listening sessions</li>
+        <li><strong>Day 7:</strong> Final music comparison + reflection</li>
+      </ul>
+    </div>
+
+    <div id="login-section">
+      <div class="form-group">
+        <label for="participant-id">Your Participant ID</label>
+        <input type="text" id="participant-id" placeholder="Enter your ID..." autocomplete="off">
+      </div>
+      <button class="btn" id="continue-btn" onclick="handleContinue()">Continue</button>
+    </div>
+
+    <div id="debug-panel" class="hidden" style="margin-top:1.5rem; padding:1.5rem; background:#fff3cd; border:2px solid #ffc107; border-radius:10px; text-align:left;">
+      <h3 style="margin-bottom:0.5rem; color:#856404;">🐛 Debug Mode</h3>
+      <p style="font-size:13px; color:#856404; margin-bottom:1rem;">Jump directly to any day (overrides Firebase progress). Trials are reduced to 2 pairs/samples with 2-second listen times.</p>
+      <div id="debug-day-buttons" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+      <div style="margin-top:1rem;">
+        <button class="btn" style="font-size:14px; padding:8px 16px; background:#dc3545;" onclick="resetParticipant()">Reset Participant</button>
+        <span style="font-size:12px; color:#856404; margin-left:8px;">Resets to Day 1</span>
+      </div>
+    </div>
+
+    <div id="status-section" class="hidden"></div>
+  </div>
+
+  <script>
+    // --- Firebase ---
+    var firebaseConfig = {
+      apiKey: "AIzaSyD1SDbm4FyI6ZIcn0UrAzHQr-wh8uRI8_8",
+      authDomain: "music-study-7658a.firebaseapp.com",
+      projectId: "music-study-7658a",
+      storageBucket: "music-study-7658a.firebasestorage.app",
+      messagingSenderId: "759926223753",
+      appId: "1:759926223753:web:163e74bc0a4657c6526758",
+      measurementId: "G-X1N2MEDBPY",
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.firestore();
+
+    // --- Debug mode ---
+    var urlParams = new URLSearchParams(window.location.search);
+    var DEBUG_MODE = urlParams.get("debug") === "true";
+
+    // Show debug panel if in debug mode
+    if (DEBUG_MODE) {
+      document.getElementById("debug-panel").classList.remove("hidden");
+      var btnContainer = document.getElementById("debug-day-buttons");
+      var dayLabels = [
+        "Day 1: Pre-Test",
+        "Day 2: Listen", "Day 3: Listen", "Day 4: Listen", "Day 5: Listen", "Day 6: Listen",
+        "Day 7: Post-Test"
+      ];
+      for (var d = 1; d <= 7; d++) {
+        (function(day) {
+          var btn = document.createElement("button");
+          btn.className = "btn";
+          btn.style.cssText = "font-size:13px; padding:8px 14px; background:" + (day === 1 || day === 7 ? "#1a73e8" : "#f39c12") + ";";
+          btn.textContent = dayLabels[day - 1];
+          btn.onclick = function() { debugGoToDay(day); };
+          btnContainer.appendChild(btn);
+        })(d);
+      }
+    }
+
+    // Auto-fill from URL param if provided
+    var urlPid = urlParams.get("PROLIFIC_PID") || urlParams.get("pid");
+    if (urlPid) {
+      document.getElementById("participant-id").value = urlPid;
+    }
+
+    // Allow Enter key to submit
+    document.getElementById("participant-id").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") handleContinue();
+    });
+
+    async function handleContinue() {
+      var pid = document.getElementById("participant-id").value.trim();
+      if (!pid) {
+        showStatus("Please enter your participant ID.", "error");
+        return;
+      }
+
+      var btn = document.getElementById("continue-btn");
+      btn.disabled = true;
+      btn.textContent = "Checking...";
+
+      try {
+        var docRef = db.collection("participants").doc(pid);
+        var doc = await docRef.get();
+        var currentDay;
+        var lastCompletedAt = null;
+
+        if (doc.exists) {
+          currentDay = doc.data().current_day;
+          lastCompletedAt = doc.data().last_completed_at || null;
+        } else {
+          // New participant — create record
+          await docRef.set({
+            participant_id: pid,
+            current_day: 1,
+            days_completed: [],
+            created_at: new Date().toISOString(),
+          });
+          currentDay = 1;
+        }
+
+        routeToDay(pid, currentDay, lastCompletedAt);
+
+      } catch (err) {
+        console.error("Firebase error:", err);
+        showStatus("Error connecting to the study server: " + err.code + " — " + err.message + "<br><small>Please try again or check browser console for details.</small>", "error");
+        btn.disabled = false;
+        btn.textContent = "Continue";
+      }
+    }
+
+    function routeToDay(pid, day, lastCompletedAt) {
+      var statusSection = document.getElementById("status-section");
+      statusSection.classList.remove("hidden");
+
+      if (day === "completed" || day > 7) {
+        statusSection.innerHTML =
+          '<div class="status-msg completed">' +
+          '<strong>Study Complete</strong><br>' +
+          'You have already completed all 7 days of the study. Thank you for participating!' +
+          '</div>';
+        return;
+      }
+
+      // --- Next-day enforcement (skipped in debug mode) ---
+      if (!DEBUG_MODE && day > 1 && lastCompletedAt) {
+        var lastDate = new Date(lastCompletedAt);
+        var now = new Date();
+        // Compare calendar dates (not times)
+        var lastDateStr = lastDate.toISOString().slice(0, 10);
+        var todayStr = now.toISOString().slice(0, 10);
+
+        if (lastDateStr === todayStr) {
+          statusSection.innerHTML =
+            '<div class="status-msg info">' +
+            '<strong>Come back tomorrow!</strong><br>' +
+            'You have already completed today\'s session (Day ' + (day - 1) + ').<br>' +
+            'Your next session (Day ' + day + ') will be available tomorrow.' +
+            '</div>';
+
+          var btn = document.getElementById("continue-btn");
+          btn.disabled = false;
+          btn.textContent = "Continue";
+          return;
+        }
+      }
+
+      var debugParam = DEBUG_MODE ? "&debug=true" : "";
+      var url, dayLabel, dayClass, description;
+
+      if (day === 1) {
+        url = "comparison.html?mode=pretest&pid=" + encodeURIComponent(pid) + debugParam;
+        dayLabel = "Day 1 — Pre-Test";
+        dayClass = "pretest";
+        description = "You will answer a few background questions, then compare pairs of music samples.";
+      } else if (day >= 2 && day <= 6) {
+        url = "experiment.html?pid=" + encodeURIComponent(pid) + "&day=" + day + debugParam;
+        dayLabel = "Day " + day + " — Listening Session";
+        dayClass = "listening";
+        description = "You will listen to and rate a series of music samples.";
+      } else if (day === 7) {
+        url = "comparison.html?mode=posttest&pid=" + encodeURIComponent(pid) + debugParam;
+        dayLabel = "Day 7 — Post-Test";
+        dayClass = "posttest";
+        description = "You will compare pairs of music samples one final time and share your reflections.";
+      }
+
+      statusSection.innerHTML =
+        '<div class="status-msg success">' +
+        '<span class="day-indicator ' + dayClass + '">' + dayLabel + '</span>' +
+        '<p style="margin-top:1rem;">' + description + '</p>' +
+        '</div>';
+
+      // Redirect after a short delay so participant can see what day they're on
+      setTimeout(function() {
+        window.location.href = url;
+      }, 2000);
+    }
+
+    function showStatus(msg, type) {
+      var el = document.getElementById("status-section");
+      el.classList.remove("hidden");
+      el.innerHTML = '<div class="status-msg ' + type + '">' + msg + '</div>';
+    }
+
+    function debugGoToDay(day) {
+      var pid = document.getElementById("participant-id").value.trim();
+      if (!pid) {
+        pid = "debug_" + Date.now();
+        document.getElementById("participant-id").value = pid;
+      }
+
+      // Update Firebase to this day, then route
+      db.collection("participants").doc(pid).set({
+        participant_id: pid,
+        current_day: day,
+        days_completed: [],
+        created_at: new Date().toISOString(),
+        debug: true,
+      }, { merge: true }).then(function() {
+        routeToDay(pid, day);
+      });
+    }
+
+    async function resetParticipant() {
+      var pid = document.getElementById("participant-id").value.trim();
+      if (!pid) {
+        showStatus("Enter a participant ID first.", "error");
+        return;
+      }
+      await db.collection("participants").doc(pid).set({
+        participant_id: pid,
+        current_day: 1,
+        days_completed: [],
+        created_at: new Date().toISOString(),
+        debug: true,
+      });
+      showStatus("Participant <strong>" + pid + "</strong> reset to Day 1.", "info");
+    }
+  </script>
 </body>
 </html>
