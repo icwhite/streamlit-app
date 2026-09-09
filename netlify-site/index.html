@@ -57,7 +57,8 @@
       color: #333;
     }
 
-    input[type="text"] {
+    input[type="text"],
+    input[type="email"] {
       width: 100%;
       padding: 12px 16px;
       font-size: 16px;
@@ -67,7 +68,8 @@
       transition: border-color 0.2s;
     }
 
-    input[type="text"]:focus {
+    input[type="text"]:focus,
+    input[type="email"]:focus {
       border-color: #4a90d9;
     }
 
@@ -187,6 +189,33 @@
         <label for="participant-id">Your Participant ID</label>
         <input type="text" id="participant-id" placeholder="Enter your ID..." autocomplete="off">
       </div>
+
+      <div class="form-group">
+        <label for="participant-email">
+          Email for daily reminders
+          <span style="font-weight:400; color:#777;">(first visit only)</span>
+        </label>
+        <input
+          type="email"
+          id="participant-email"
+          placeholder="you@example.com"
+          autocomplete="email"
+        >
+        <p style="font-size:12px; color:#777; margin-top:6px;">
+          Your email is stored separately from your study responses and is used
+          only for study reminders.
+        </p>
+      </div>
+
+      <div class="form-group" style="font-size:13px; color:#555;">
+        <label style="display:flex; gap:8px; align-items:flex-start; font-weight:400;">
+          <input type="checkbox" id="reminder-consent" style="margin-top:3px;">
+          <span>
+            I agree to receive reminder emails during this 7-day study.
+            This is required only when registering your email for the first time.
+          </span>
+        </label>
+      </div>
       <button class="btn" id="continue-btn" onclick="handleContinue()">Continue</button>
     </div>
 
@@ -255,6 +284,9 @@
 
     async function handleContinue() {
       var pid = document.getElementById("participant-id").value.trim();
+      var email = document.getElementById("participant-email").value.trim();
+      var reminderConsent = document.getElementById("reminder-consent").checked;
+
       if (!pid) {
         showStatus("Please enter your participant ID.", "error");
         return;
@@ -269,12 +301,35 @@
         var doc = await docRef.get();
         var currentDay;
         var lastCompletedAt = null;
+        var reminderRegistered =
+          doc.exists && doc.data().reminder_registered === true;
+
+        if (!reminderRegistered) {
+          if (!email || !isValidEmail(email)) {
+            showStatus(
+              "Please enter a valid email address for study reminders.",
+              "error"
+            );
+            btn.disabled = false;
+            btn.textContent = "Continue";
+            return;
+          }
+
+          if (!reminderConsent) {
+            showStatus(
+              "Please confirm that you agree to receive reminder emails.",
+              "error"
+            );
+            btn.disabled = false;
+            btn.textContent = "Continue";
+            return;
+          }
+        }
 
         if (doc.exists) {
           currentDay = doc.data().current_day;
           lastCompletedAt = doc.data().last_completed_at || null;
         } else {
-          // New participant — create record
           await docRef.set({
             participant_id: pid,
             current_day: 1,
@@ -284,14 +339,56 @@
           currentDay = 1;
         }
 
+        if (!reminderRegistered) {
+          btn.textContent = "Registering reminder...";
+          await registerReminder(pid, email, reminderConsent);
+        }
+
         routeToDay(pid, currentDay, lastCompletedAt);
 
       } catch (err) {
-        console.error("Firebase error:", err);
-        showStatus("Error connecting to the study server: " + err.code + " — " + err.message + "<br><small>Please try again or check browser console for details.</small>", "error");
+        console.error("Study login/registration error:", err);
+        showStatus(
+          "Error connecting to the study server: " +
+            (err.message || err) +
+            "<br><small>Please try again or contact the study team if the problem continues.</small>",
+          "error"
+        );
         btn.disabled = false;
         btn.textContent = "Continue";
       }
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    async function registerReminder(pid, email, consent) {
+      var response = await fetch("/api/register-reminder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          participant_id: pid,
+          email: email,
+          reminder_consent: consent === true,
+        }),
+      });
+
+      var payload = {};
+      try {
+        payload = await response.json();
+      } catch (_) {
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          payload.error || "Could not register reminder email."
+        );
+      }
+
+      return payload;
     }
 
     function routeToDay(pid, day, lastCompletedAt) {

@@ -44,8 +44,8 @@ const PAIR_NUMBERS = ["001", "002", "003", "004", "005", "006", "007", "008", "0
 
 const COMPARISON_PAIRS = PAIR_NUMBERS.map((num) => ({
   num: num,
-  ai: { id: "ai_" + num, file: AUDIO_BASE_URL + "ai_" + num + ".mp3" },
-  human: { id: "human_" + num, file: AUDIO_BASE_URL + "human_" + num + ".mp3" },
+  ai: { id: "ai_" + num, file: AUDIO_BASE_URL + "ai_" + num + ".wav" },
+  human: { id: "human_" + num, file: AUDIO_BASE_URL + "human_" + num + ".wav" },
 }));
 
 // Shuffle array (Fisher-Yates)
