@@ -1,2 +1,8 @@
 .streamlit/*
 *.json
+node_modules/
+.netlify/
+.env
+.env.*
+!/package.json
+!/package-lock.json

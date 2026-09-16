@@ -1,0 +1,10 @@
+# Netlify configuration
+[build]
+  publish = "netlify-site"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[functions."send-reminders"]
+  schedule = "0 16 * * *"
